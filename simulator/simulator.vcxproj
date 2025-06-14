@@ -127,7 +127,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="isa_func.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="sim_helpers.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="isa_func.h" />
