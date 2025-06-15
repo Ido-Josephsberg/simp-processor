@@ -452,5 +452,6 @@ FodyWeavers.xsd
 *.sln.iml
 
 # my add-in
+*.vcxproj.filters
 *.suo
 .vs/

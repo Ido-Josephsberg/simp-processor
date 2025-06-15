@@ -131,9 +131,13 @@
     <ClInclude Include="register.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="register.c" />
     <ClCompile Include="isa_func.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="register.c" />
+    <ClCompile Include="sim_helpers.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="isa_func.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
