@@ -59,7 +59,7 @@ static void isa_srl(reg_file* rf, reg_name rd, reg_name rs, reg_name rt) {
 static void isa_beq(reg_file* rf, reg_name rd, reg_name rs, reg_name rt) {
 	if (read_register(rf, rs) == read_register(rf, rt)) {
 		// Branch taken, adjust the program counter (PC)
-		pc = read_register(rf, rd);														// Assuming 'pc' is a global variable representing the program counter
+		pc = read_register(rf, rd) & 0xfff;	// 12 bit mask for pc								// Assuming 'pc' is a global variable representing the program counter
 	}
 }
 
@@ -67,7 +67,7 @@ static void isa_beq(reg_file* rf, reg_name rd, reg_name rs, reg_name rt) {
 static void isa_bne(reg_file* rf, reg_name rd, reg_name rs, reg_name rt) {
 	if (read_register(rf, rs) != read_register(rf, rt)) {
 		// Branch taken, adjust the program counter (PC)
-		pc = read_register(rf, rd); 													// Assuming 'pc' is a global variable representing the program counter
+		pc = read_register(rf, rd) & 0xfff;	// 12 bit mask for pc								// Assuming 'pc' is a global variable representing the program counter
 	}
 }
 
@@ -75,7 +75,7 @@ static void isa_bne(reg_file* rf, reg_name rd, reg_name rs, reg_name rt) {
 static void isa_blt(reg_file* rf, reg_name rd, reg_name rs, reg_name rt) {
 	if (read_register(rf, rs) < read_register(rf, rt)) {
 		// Branch taken, adjust the program counter (PC)
-		pc = read_register(rf, rd); 													// Assuming 'pc' is a global variable representing the program counter
+		pc = read_register(rf, rd) & 0xfff;	// 12 bit mask for pc								// Assuming 'pc' is a global variable representing the program counter
 	}
 }
 
@@ -83,6 +83,32 @@ static void isa_blt(reg_file* rf, reg_name rd, reg_name rs, reg_name rt) {
 static void isa_bgt(reg_file* rf, reg_name rd, reg_name rs, reg_name rt) {
 	if (read_register(rf, rs) > read_register(rf, rt)) {
 		// Branch taken, adjust the program counter (PC)
-		pc = read_register(rf, rd); 													// Assuming 'pc' is a global variable representing the program counter
+		pc = read_register(rf, rd) & 0xfff;	// 12 bit mask for pc								// Assuming 'pc' is a global variable representing the program counter
 	}
 }
+
+// 13. Implementation of the "ble" ISA instruction
+static void isa_ble(reg_file* rf, reg_name rd, reg_name rs, reg_name rt) {
+	if (read_register(rf, rs) <= read_register(rf, rt)) {
+		// Branch taken, adjust the program counter (PC)
+		pc = read_register(rf, rd) & 0xfff;	// 12 bit mask for pc								// Assuming 'pc' is a global variable representing the program counter
+	}
+}
+
+// 14. Implementation of the "bge" ISA instruction
+static void isa_bge(reg_file* rf, reg_name rd, reg_name rs, reg_name rt) {
+	if (read_register(rf, rs) >= read_register(rf, rt)) {
+		// Branch taken, adjust the program counter (PC)
+		pc = read_register(rf, rd) & 0xfff;	// 12 bit mask for pc								// Assuming 'pc' is a global variable representing the program counter
+	}
+}
+
+// 15. Implementation of the "jal" ISA instruction
+static void isa_jal(reg_file* rf, reg_name rd, reg_name rs, reg_name rt) {
+	// Save the return address in the link register (rd should be REG_RA)
+	write_register(rf, rd, pc + 1); // Save the next instruction address
+	// Jump to the target address
+	pc = read_register(rf, rs) & 0xfff; // 12 bit mask for pc								// Assuming 'pc' is a global variable representing the program counter
+}
+
+// 16. Implementation of the "lw" ISA instruction
