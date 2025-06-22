@@ -127,14 +127,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="isa_func.c" />
-    <ClCompile Include="main.c" />
-    <ClCompile Include="sim_helpers.c" />
+    <ClInclude Include="io_register.h" />
+    <ClInclude Include="isa_func.h" />
+    <ClInclude Include="memory.h" />
+    <ClInclude Include="register.h" />
+    <ClInclude Include="simulator.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="isa_func.h" />
-    <ClInclude Include="register_delete_before_merge.h" />
-    <ClInclude Include="simp_helpers.h" />
+    <ClCompile Include="io_register.c" />
+    <ClCompile Include="memory.c" />
+    <ClCompile Include="register.c" />
+    <ClCompile Include="isa_func.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="simulator.c" />
+    <ClCompile Include="sim_helpers.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
