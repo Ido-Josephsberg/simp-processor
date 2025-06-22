@@ -6,32 +6,32 @@
 
 #define REG_NUM 16
 
+// forward declaration of Simulator structure
+struct Simulator;
+typedef struct Simulator Simulator;
+
 typedef enum {
-	REG_ZERO,	// 0
-	REG_IMM,	// 1
-	REG_V0,		// 2
-    REG_A0,     // 3
-    REG_A1,     // 4
-    REG_A2,     // 5
-	REG_A3,     // 6
-    REG_T0,     // 7
-    REG_T1,     // 8
-    REG_T2,     // 9
-    REG_S0,     // 10
-    REG_S1,     // 11
-    REG_S2,     // 12
-    REG_GP,     // 13
-    REG_SP,     // 14
-    REG_RA      // 15
+	ZERO,	// 0
+	IMM,	// 1
+	V0,		// 2
+    A0,     // 3
+    A1,     // 4
+    A2,     // 5
+    A3,     // 6
+    T0,     // 7
+    T1,     // 8
+    T2,     // 9
+    S0,     // 10
+    S1,     // 11
+    S2,     // 12
+    GP,     // 13
+    SP,     // 14
+    RA      // 15
 } reg_name;
 
-// A struct with array to hold the registers' values
-typedef struct {
-    int32_t reg_array[REG_NUM];
-} reg_file;
-
 // Register Related Functions
-int32_t read_register(reg_file* rf, reg_name reg);
-void write_register(reg_file* rf, reg_name reg, int32_t value);
+int32_t read_register(Simulator* sim, reg_name reg);
+void write_register(Simulator* sim, reg_name reg, int32_t value);
+void write_register_imm(Simulator* sim, int32_t value);
 
 #endif // REGISTER_H
