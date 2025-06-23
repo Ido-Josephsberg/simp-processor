@@ -1,8 +1,10 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdint.h>
 #include "simulator.h"
 #include "register.h"
 #include "write_helpers.h"
-#include "sim_helpers.h"
+#include "files_handler.h"
 
 
 // Read from any register
@@ -31,6 +33,10 @@ int write_regout_file_wrapper(Simulator* sim, output_paths* path) {
 
 	// Open the output file for writing
     FILE* regout_file = checked_fopen(regout_path, "w");
+    if (regout_file == NULL) {
+        printf("Error opening file %s for writing\n", regout_path);
+        return -1; // Return error code
+	}
 
 	//write the registers content to the file
     if (write_registers_content_to_file(regout_file, sim->reg_array) != 0) {

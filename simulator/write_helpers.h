@@ -11,3 +11,6 @@ int write_num_to_file(FILE* file, int num);
 
 int write_registers_content_to_file(FILE* file, int32_t* reg_array);
 
+int write_memory_content_to_file(FILE* file, uint32_t* memory);
+
+int write_diskout_content_to_file(FILE* file, int32_t** disk);

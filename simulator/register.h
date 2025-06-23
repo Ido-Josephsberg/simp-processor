@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include "files_handler.h"
 
 #define REG_NUM 16
 

@@ -127,13 +127,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="files_handler.h" />
     <ClInclude Include="io_register.h" />
     <ClInclude Include="isa_func.h" />
     <ClInclude Include="memory.h" />
     <ClInclude Include="register.h" />
     <ClInclude Include="simulator.h" />
+    <ClInclude Include="sim_helpers.h" />
+    <ClInclude Include="write_helpers.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="files_handler.c" />
     <ClCompile Include="io_register.c" />
     <ClCompile Include="memory.c" />
     <ClCompile Include="register.c" />
@@ -141,6 +145,7 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="simulator.c" />
     <ClCompile Include="sim_helpers.c" />
+    <ClCompile Include="write_helpers.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
