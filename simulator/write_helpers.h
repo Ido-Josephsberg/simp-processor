@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "simp_helpers.h" // DELETE AFTER IMPLEMENTING FILES PER FUNCTION.
 
 //////////////////////////// Write Functions ////////////////////////////////
 FILE* checked_fopen(const char* path, const char* mode);
@@ -13,4 +14,5 @@ int write_registers_content_to_file(FILE* file, int32_t* reg_array);
 
 int write_memory_content_to_file(FILE* file, uint32_t* memory);
 
-int write_diskout_content_to_file(FILE* file, int32_t** disk);
+int write_disk_content_to_file(FILE* file, int32_t** disk);
+

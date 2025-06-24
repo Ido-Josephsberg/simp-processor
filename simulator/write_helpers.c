@@ -4,9 +4,11 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include "simp_helpers.h" // DELETE AFTER IMPLEMENTING FILES PER FUNCTION.
 #include "write_helpers.h"
 #include "register.h"
 #include "memory.h"
+#include "simulator.h"
 
 /////////////////////////////////////////// [TODO] /////////////////////////////////////////
 // Todos:
@@ -138,17 +140,29 @@ int write_memory_content_to_file(FILE* file, uint32_t* memory) {
 	return 0;
 }
 
-int write_diskout_content_to_file(FILE* file, uint32_t** diskout) {
+int write_disk_content_to_file(FILE* file, uint32_t** disk) {
 	/*
 	 @brief: This function writes the content of a diskout array to a file in 8-digit zero-padded hexadecimal format.
-			 - relevant to functions: write_diskout (1 in total)
+			 - it writes the full diskout content, whether it is zero or not.
 	 @param: file - pointer to the file where the diskout content will be written.
 	 @param: diskout - a pointer to an array of unsigned 32-bit integers representing the diskout content.
 	 @param: diskout_size - the size of the diskout array in bytes.
 	 @return: int - returns 0 on success, or -1 if an error occurs (e.g., if the file cannot be opened or written to).
 	 */
 	
-	 //TODO: Implement the logic to write the diskout content to the file.
+	 // Check if the file pointer and disk pointer are not NULL
+	if (disk == NULL || file == NULL) {
+		return -1; // Error: file pointer is NULL
+	}
 
+	// Write disk content to the file
+	for (int i = 0; i < DISK_SECTORS; i++) {
+		for (int j = 0; j < DISK_ROWS; j++) {
+			// Write the number in 8-digit zero-padded hexadecimal format
+			if (fprintf(file, "%08X", disk[i][j]) < 0) {
+				return -1; // fclose will be called outside the function.
+			}
+		}
+	}
 	return 0;
 }
