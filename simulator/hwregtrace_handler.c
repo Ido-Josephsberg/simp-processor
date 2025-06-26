@@ -11,15 +11,11 @@
 
 static void add_curr_data_to_hwregtrace(Simulator* sim) {
 	/*
-	Update the hwregtrace with the current cycle, indication to wether it were read or write instruction, the name of the hardware register and the data read from/ write to register.
-	hwregtrace_str: The pointer to the string containing str. Should be allocated with at least HWREGTRACE_LINE_SIZE chars more than his size before the function call.
-	cycle: The current cycle number.
-	inst: The instruction being executed.
-	hwreg_arr: Array that holds the hardware registers of the processor.
-	reg_index: Index of the hardwer register that was involved in the instruction
+	Update the hwregtrace with the current cycle, indication to whether it was a read or write instruction, the name of the hardware register and the data read from/ written to the register.
+	sim: The pointer to the simulator struct that contains the current state of the simulation, including the current cycle, instruction being executed, and the hardware register array.
 	*/
 
-	// Declare string that can contain "read" or "write", including null terminator, a string that can contain the name of 
+	// Declare string that can contain "READ" or "WRITE", including null terminator, a string that can contain the name of 
 	// the register which is being read from or written to and a string for the new line.
 	char read_write[6], io_reg_name[IO_REG_MAX_NAME_SIZE], new_line[HWREGTRACE_LINE_SIZE];
 	// Check if the instruction is a read (IN) or write (OUT) operation.
@@ -43,12 +39,7 @@ static void add_curr_data_to_hwregtrace(Simulator* sim) {
 void update_hwregtrace(Simulator* sim) {
 	/*
 	Update the hardware register trace string with the current value of a specific hardware register, in the format "CYCLE READ/WRITE NAME DATA"
-	hwregtrace_str: The pointer to the pointer of the string containing hwregtrace. Should be allocated with at least HWREGTRACE_LINE_SIZE chars more than his size before the function call.
-	allocated_memory_size_ptr: Pointer to the variable storing the current allocated memory size.
-	cycle: The current cycle number.
-	inst: The instruction being executed.
-	hwreg_arr: Array that holds the hardware registers of the processor.
-	reg_index: Index of the hardwer register that was involved in the instruction
+	sim: The pointer to the simulator struct that contains the current state of the simulation, including the current cycle, instruction being executed, and the hardware register array.
 	*/
 
 	// Ensure that the hwregtrace_str has enough allocated memory to append new line.

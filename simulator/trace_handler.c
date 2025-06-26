@@ -33,12 +33,7 @@ static void add_curr_data_to_trace(Simulator* sim) {
 void update_trace(Simulator* sim) {
 	/*
 	Update the trace string with the current cycle, program counter, instruction, and register values, after ensuring that the trace_str has enough allocated memory to append a new line.
-	trace_str: The pointer to the pointer of the string containing trace. Should be allocated with at least TRACE_LINE_SIZE chars more than his size before the function call.
-	allocated_memory_size_ptr: Pointer to the variable storing the current allocated memory size.
-	cycle: The current cycle number.
-	pc: The program counter value.
-	inst: The instruction being executed.
-	reg: Object that holds the registers of the processor.
+	sim: The pointer to the simulator object containing the current state of the simulation.
 	*/
 
 	// Ensure that the trace_str has enough allocated memory to append new line.
