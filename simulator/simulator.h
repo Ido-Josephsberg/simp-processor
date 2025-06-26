@@ -11,7 +11,7 @@
 #define DISK_SECTORS 128            // Number of sectors in hard disk           --> Remove this if there's a disk file to include here
 #define DISK_ROWS 128               // Number of rows in hard disk's sector     --> Remove this if there's a disk file to include here
 
-typedef struct {
+typedef struct Simulator {
     bool is_running;
     int32_t pc;                                 // Program Counter
     int32_t reg_array[REG_NUM];                 // Array of registers
