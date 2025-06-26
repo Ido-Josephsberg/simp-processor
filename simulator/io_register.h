@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #define IO_REG_NUM 23
+#define IO_REG_MAX_NAME_SIZE 12
 
 // forward declaration of Simulator structure
 struct Simulator;
@@ -26,7 +27,7 @@ typedef enum {
     TIMERCURRENT,   // 12
     TIMERMAX,       // 13
     DISKCMD,        // 14
-    DISKSSECTOR,    // 15
+    DISKSECTOR,    // 15
     DISKBUFFER,     // 16
     DISKSTATUS,     // 17
     RESERVED18,     // 18
@@ -35,6 +36,11 @@ typedef enum {
     MONITORDATA,    // 21
     MONITORCMD      // 22
 } io_reg_name;
+
+
+void get_io_reg_name(char* dst, io_reg_name index);
+
+
 
 // Register Related Functions
 // TODO                                                                                 # TODO # TODO # BOM
