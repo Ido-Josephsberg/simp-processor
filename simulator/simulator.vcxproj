@@ -127,12 +127,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="isa_func.c" />
-    <ClCompile Include="main.c" />
-    <ClCompile Include="sim_helpers.c" />
+    <ClInclude Include="dynamic_str.h" />
+    <ClInclude Include="hwregtrace_handler.h" />
+    <ClInclude Include="io_register.h" />
+    <ClInclude Include="isa_func.h" />
+    <ClInclude Include="leds_handler.h" />
+    <ClInclude Include="memory.h" />
+    <ClInclude Include="register.h" />
+    <ClInclude Include="seg7display_handler.h" />
+    <ClInclude Include="simulator.h" />
+    <ClInclude Include="trace_handler.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="isa_func.h" />
+    <ClCompile Include="dynamic_str.c" />
+    <ClCompile Include="hwregtrace_handler.c" />
+    <ClCompile Include="io_register.c" />
+    <ClCompile Include="leds_handler.c" />
+    <ClCompile Include="memory.c" />
+    <ClCompile Include="seg7display_handler.c" />
+    <ClCompile Include="trace_handler.c" />
+    <ClInclude Include="sim_helpers.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="register.c" />
+    <ClCompile Include="isa_func.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="simulator.c" />
+    <ClCompile Include="sim_helpers.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
