@@ -1,3 +1,4 @@
+#pragma once
 #include <stdio.h>
 #include "files_handler.h"
 #include "simulator.h"
