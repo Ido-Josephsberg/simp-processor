@@ -22,7 +22,7 @@ typedef struct Simulator {
     int32_t memory[MEMORY_SIZE];                // Memory array
     int32_t cycles;                             // Cycle count
     int32_t disk[DISK_SECTORS][DISK_ROWS];      // Hard disk represented as a 2D array
-    DynamicString trace_str, hwregtrace_str;    // Dynamic string of trace and Dynamic string of hwregtrace
+	DynamicString trace_str, hwregtrace_str, leds_str, seg7display_str;    // Dynamic strings for output files.
 } Simulator;
 
 // Simulator Related Functions
