@@ -16,5 +16,5 @@ void get_io_reg_name(char* dst, int index) {
 		"irq1status", "irq2status", "irqhandler", "irqreturn", "clks", "leds", "display7seg",
 		"timerenable", "timercurrent", "timermax", "diskcmd", "disksector" };
 	// Copy the name of the io register to the destination string.
-	strcpy(dst, hw_reg_names[IO_REG_MAX_NAME_SIZE]);
+	strcpy(dst, hw_reg_names[index]);
 }
