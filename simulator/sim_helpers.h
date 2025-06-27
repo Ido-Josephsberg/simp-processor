@@ -3,8 +3,6 @@
 #include "files_handler.h"
 #include "simulator.h"
 
-
-
 #define CYCLE_NUM_OF_DIGITS 8
 #define PC_NUM_OF_DIGITS 3
 #define INST_NUM_OF_DIGITS 8
