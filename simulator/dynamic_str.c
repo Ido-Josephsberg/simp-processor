@@ -34,15 +34,13 @@ DynamicString* create_dynamic_str() {
 
 void dynamic_str_reallocate(DynamicString* str) {
 	/*
-	realocate the memory block to a new size that is the square of the original size and update the pointer. returns the new size of the memory block.
+	realocate the memory block to a new size that is the double of the original size and update the pointer.
 	exits the program with MEMORY_ERROR if the reallocation fails.
-	ptr: Pointer to the pointer that holds the memory address to be reallocated.
-	size: The size of the original memory block to be reallocated.
-	returns: The new size of the memory block after reallocation.
+	str: Pointer to the dynamic string that needs reallocation.
 	*/
 
-	// Increase the size of the allocated memory by squaring his current size. 
-	str->alloc_size = str->alloc_size * str->alloc_size;
+	// Increase the size of the allocated memory by doubling his current size. 
+	str->alloc_size *= 2;
 	// Attempt to reallocate memory
 	void* new_ptr = realloc(str->data, str->alloc_size);
 	// Check if the reallocation was successful
@@ -65,7 +63,7 @@ void ensure_str_capacity(DynamicString* str, int needed_size_buffer) {
 
 	// Calculate the total size needed for the new string, which is the current string length plus the size of the buffer needed.
 	size_t size_of_new_str = strlen(str->data) + needed_size_buffer;
-	// While the current allocated memory size is less than the size needed for the new string, reallocate memory and update the current allocated memory size (to square of the original size).
+	// While the current allocated memory size is less than the size needed for the new string, reallocate memory and update the current allocated memory size (to double of the original size).
 	while (str->alloc_size < size_of_new_str) {
 		dynamic_str_reallocate(str);
 	}
