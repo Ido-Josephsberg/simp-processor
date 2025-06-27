@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "simp_helpers.h" // DELETE AFTER IMPLEMENTING FILES PER FUNCTION.
+#include "sim_helpers.h" // DELETE AFTER IMPLEMENTING FILES PER FUNCTION.
 #include "write_helpers.h"
 #include "register.h"
 #include "memory.h"
@@ -15,7 +15,7 @@
 //		
 //		* Consider using a more robust error handling mechanism instead of just printing errors.
 //      * implement write_diskout_content_to_file()
-//		* implement write monitor to file content
+//		* Check if in write_num_to_file() we need to add a newline after the number.
 //
 /////////////////////////////////////////// [TODOS] /////////////////////////////////////////
 
@@ -47,7 +47,7 @@ int write_str_to_file(FILE* file, char* str) {
 
 	 @return: int - returns 0 on success, or -1 if an error occurs (e.g., if the file cannot be opened or written to).
 	 */
-	if (file == NULL) {
+	if (str == NULL || file == NULL) {
 		return -1; // Error: file pointer is NULL
 	}
 
@@ -77,7 +77,7 @@ int write_num_to_file(FILE* file, int num) {
 	}
 	
 	// Write the number in 8-digit zero-padded hexadecimal format
-	if (fprintf(file, "%08X", num) < 0) {
+	if (fprintf(file, "%08X\n", num) < 0) {
 		return -1; // fclose will be called outside the function.
 	}
 
@@ -95,6 +95,8 @@ int write_registers_content_to_file(FILE* file, int32_t* reg_array) {
 
 	 @return: int - returns 0 on success, or -1 if an error occurs (e.g., if the file cannot be opened or written to).
 	 */
+	if (reg_array == NULL || file == NULL)
+		return -1; // Error: file pointer is NULL
 
 	int num_regs = REG_NUM; // R2 to R15 inclusive
 
@@ -118,13 +120,13 @@ int write_memory_content_to_file(FILE* file, uint32_t* memory) {
 
 	 @return: int - returns 0 on success, or -1 if an error occurs (e.g., if the file cannot be opened or written to).
 	 */
-	if (file == NULL)
+	if (memory == NULL || file == NULL)
 		return -1; // Error: file pointer is NULL
 
-	// Find last non-zero line in memory
+	// Find last non-zero line in memory /// I DONT THINK ITS NEEDED!!!
 	int32_t last_non_zero_line = 0;
 	
-	for (int32_t i = 0; i < MEMORY_SIZE; i++) {
+	for (int32_t i = 0; i < MEMORY_SIZE; i++) { 
 		printf("%d\n", i); //DEBUG
 		if (memory[i] != 0) {
 			last_non_zero_line = i;
@@ -142,10 +144,10 @@ int write_memory_content_to_file(FILE* file, uint32_t* memory) {
 
 int write_disk_content_to_file(FILE* file, uint32_t** disk) {
 	/*
-	 @brief: This function writes the content of a diskout array to a file in 8-digit zero-padded hexadecimal format.
+	 @brief: This function writes the content of a diskout 2D array to a file in 8-digit zero-padded hexadecimal format.
 			 - it writes the full diskout content, whether it is zero or not.
 	 @param: file - pointer to the file where the diskout content will be written.
-	 @param: diskout - a pointer to an array of unsigned 32-bit integers representing the diskout content.
+	 @param: diskout - a pointer to a 2D array of unsigned 32-bit integers representing the diskout content.
 	 @param: diskout_size - the size of the diskout array in bytes.
 	 @return: int - returns 0 on success, or -1 if an error occurs (e.g., if the file cannot be opened or written to).
 	 */
@@ -159,7 +161,34 @@ int write_disk_content_to_file(FILE* file, uint32_t** disk) {
 	for (int i = 0; i < DISK_SECTORS; i++) {
 		for (int j = 0; j < DISK_ROWS; j++) {
 			// Write the number in 8-digit zero-padded hexadecimal format
-			if (fprintf(file, "%08X", disk[i][j]) < 0) {
+			if (fprintf(file, "%08X\n", disk[i][j]) < 0) {
+				return -1; // fclose will be called outside the function.
+			}
+		}
+	}
+	return 0;
+}
+
+int write_monitor_content_to_file(FILE* file, uint8_t** monitor) {
+	/*
+	 @brief: This function writes the content of a monitor 2D array to a file in 8-digit zero-padded hexadecimal format.
+			 - it writes the full monitor content, whether it is zero or not.
+	 @param: file - pointer to the file where the diskout content will be written.
+	 @param: diskout - a pointer to an array of unsigned 8-bit integers representing the diskout content.
+	 @param: diskout_size - the size of the diskout array in bytes.
+	 @return: int - returns 0 on success, or -1 if an error occurs (e.g., if the file cannot be opened or written to).
+	 */
+
+	 // Check if the file pointer and disk pointer are not NULL
+	if (monitor == NULL || file == NULL) {
+		return -1; // Error: file pointer is NULL
+	}
+
+	// Write disk content to the file
+	for (int i = 0; i < PIXEL_PER_ROW_COL; i++) {
+		for (int j = 0; j < PIXEL_PER_ROW_COL; j++) {
+			// Write the number in 8-digit zero-padded hexadecimal format
+			if (fprintf(file, "%02X\n", monitor[i][j]) < 0) {
 				return -1; // fclose will be called outside the function.
 			}
 		}
