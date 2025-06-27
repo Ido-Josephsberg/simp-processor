@@ -11,7 +11,7 @@ typedef struct Simulator Simulator;
 
 // Memory Related Functions
 int32_t read_memory(Simulator* sim, int32_t address);
-write_memory(Simulator* sim, int32_t address, int32_t value);
+int write_memory(Simulator* sim, int32_t address, int32_t value);
 
 
 #endif // MEMORY_H
