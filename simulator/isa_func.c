@@ -1,4 +1,5 @@
 #include "register.h"
+#include "io_register.h"
 #include "simulator.h"
 
 // 0. Implementation of the "ADD" ISA instruction
@@ -127,19 +128,24 @@ static void isa_sw(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	write_memory(sim, address, value);
 }
 
-// 18. Implementation of the "reti" ISA instruction										# TODO # TODO # BOM
+// 18. Implementation of the "reti" ISA instruction	(interupt return address)
 static void isa_reti(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
-
+	int32_t return_address = read_io_reg(sim, IRQRETURN);
+	sim->pc = return_address & 0xfff;	// 12 bit mask for sim->pc
 }
 
-// 19. Implementation of the "in" ISA instruction										# TODO # TODO # BOM
+// 19. Implementation of the "in" ISA instruction
 static void isa_in(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
-
+	int32_t io_reg_index = read_register(sim, rs) + read_register(sim, rt);
+	int32_t value = read_io_reg(sim, io_reg_index);
+	write_register(sim, rd, value);
 }
 
-// 20. Implementation of the "out" ISA instruction										# TODO # TODO # BOM
+// 20. Implementation of the "out" ISA instruction
 static void isa_out(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
-	
+	int32_t io_reg_index = read_register(sim, rs) + read_register(sim, rt);
+	int32_t value = read_register(sim, rd);
+	write_io_reg(sim, io_reg_index, value);
 }
 
 // 21. Implementation of the "halt" ISA instruction										# Need to implement halt functionality on the simulator	file

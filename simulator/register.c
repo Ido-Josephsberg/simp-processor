@@ -2,6 +2,12 @@
 #include "simulator.h"
 #include "register.h"
 
+// Initialize the register array to zero
+void init_reg_array(Simulator* sim) {
+    for (int i = 0; i < REG_NUM; i++) {
+        sim->reg_array[i] = 0;
+    }
+}
 
 // Read from any register
 int32_t read_register(Simulator* sim, reg_name reg) {
