@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include "files_handler.h"
 
 #define REG_NUM 16
 
@@ -33,5 +34,6 @@ typedef enum {
 int32_t read_register(Simulator* sim, reg_name reg);
 void write_register(Simulator* sim, reg_name reg, int32_t value);
 void write_register_imm(Simulator* sim, int32_t value);
+int write_regout_file_wrapper(Simulator* sim, output_paths* path);
 
 #endif // REGISTER_H
