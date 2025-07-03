@@ -1,4 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include "simulator.h"
 #include "sim_helpers.h"
 #include "trace_handler.h"
@@ -41,26 +40,4 @@ void update_trace(Simulator* sim) {
 	ensure_str_capacity(&(sim->trace_str), TRACE_LINE_SIZE);
 	// Update the trace string with the current cycle, pc, instruction, and register values.
 	add_curr_data_to_trace(sim);
-}
-
-int write_trace_file_wrapper(Simulator* sim, output_paths* paths) {
-	char* trace_path = paths->trace_path;
-	// Open the output file for writing
-	FILE* trace_file = checked_fopen(trace_path, "w");
-	if (trace_file == NULL) {
-		printf("Error opening file %s for writing\n", trace_path);
-		return -1; // Return error code
-	}
-	//extract the trace string from the simulator.
-	char* trace_string = sim->trace_str.data;
-
-	//write the trace string content to the file
-	if (write_str_to_file(trace_file, trace_string) != 0) {
-		printf("Error writing trace data to file %s\n", trace_path);
-		fclose(trace_file);
-		return -1; // Return error code
-	}
-
-	fclose(trace_file);
-	return 0;
 }

@@ -1,4 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include "simulator.h"
 #include "leds_handler.h"
 #include "io_register.h"
@@ -27,28 +26,4 @@ void update_leds(Simulator* sim) {
 	ensure_str_capacity(&(sim->leds_str), LEDS_LINE_SIZE);
 	// Update the trace string with the current cycle, pc, instruction, and register values.
 	add_curr_data_to_leds(sim);
-}
-
-int write_leds_file_wrapper(Simulator* sim, output_paths* paths) {
-
-	char* leds_path = paths->leds_path;
-
-	// Open the output file for writing
-	FILE* leds_file = checked_fopen(leds_path, "w");
-	if (leds_file == NULL) {
-		printf("Error opening file %s for writing\n", leds_path);
-		return -1; // Return error code
-	}
-	//*TODO: Implement the logic to extract the leds string from the simulator.
-	char* leds_string = sim->leds_str.data;
-
-	//write the trace string content to the file
-	if (write_str_to_file(leds_file, leds_string) != 0) {
-		printf("Error writing memory content to file %s\n", leds_path);
-		fclose(leds_file);
-		return -1; // Return error code
-	}
-
-	fclose(leds_file);
-	return 0;
 }

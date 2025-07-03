@@ -27,7 +27,7 @@ typedef enum {
     TIMERCURRENT,   // 12
     TIMERMAX,       // 13
     DISKCMD,        // 14
-    DISKSECTOR,    // 15
+    DISKSECTOR,     // 15
     DISKBUFFER,     // 16
     DISKSTATUS,     // 17
     RESERVED18,     // 18
@@ -38,15 +38,10 @@ typedef enum {
 } io_reg_name;
 
 
-void get_io_reg_name(char* dst, io_reg_name index);
-
-
-
-// Register Related Functions
-// TODO                                                                                 # TODO # TODO # BOM
-//int32_t read_io_register(Simulator* sim, io_reg_name reg, ??????? );
-//void write_io_register(Simulator* sim, io_reg_name reg, int32_t value, ???????);
-// more functions as needed 
-
+void init_io_reg_array(Simulator* sim);
+void get_io_reg_name(char* dst, io_reg_name reg_index);
+int get_io_reg_length(io_reg_name reg_index);
+int32_t read_io_reg(Simulator* sim, io_reg_name reg_index);
+void write_io_reg(Simulator* sim, io_reg_name reg_index, int32_t value);
 
 #endif // IO_REGISTER_H

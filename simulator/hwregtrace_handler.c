@@ -47,27 +47,3 @@ void update_hwregtrace(Simulator* sim) {
 	// Format the hwregtrace string with the cycle written with CYCLE_NUM_OF_DIGITS digits, READ/WRITE indication, and the data.
 	add_curr_data_to_hwregtrace(sim);
 }
-
-int write_hwregtrace_file_wrapper(Simulator* sim, output_paths* paths) {
-
-	char* hwregtrace_path = paths->hwregtrace_path;
-
-	// Open the output file for writing
-	FILE* hwregtrace_file = checked_fopen(hwregtrace_path, "w");
-	if (hwregtrace_file == NULL) {
-		printf("Error opening file %s for writing\n", hwregtrace_path);
-		return -1; // Return error code
-	}
-	// Extract the hwregtrace string from the simulator.
-	char* hwregtrace_string = sim->hwregtrace_str.data;
-
-	//write the trace string content to the file
-	if (write_str_to_file(hwregtrace_file, hwregtrace_string) != 0) {
-		printf("Error writing hardware register trace to file %s\n", hwregtrace_path);
-		fclose(hwregtrace_file);
-		return -1; // Return error code
-	}
-
-	fclose(hwregtrace_file);
-	return 0;
-}

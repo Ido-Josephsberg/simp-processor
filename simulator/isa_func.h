@@ -1,5 +1,5 @@
 #pragma once
-
+#define ISA_FUNC_NUM_OF_FUNCS 22
 
 typedef enum {
 	ADD, // 0
@@ -25,3 +25,26 @@ typedef enum {
 	OUT, // 20
 	HALT // 21
 }isa_opcode;
+
+void isa_add(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_sub(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_mul(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_and(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_or(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_xor(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_sll(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_sra(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_srl(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_beq(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_bne(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_blt(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_bgt(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_ble(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_bge(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_jal(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_lw(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_sw(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_reti(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_in(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
+void isa_out(Simulator* sim, reg_name rs, reg_name rt, reg_name rd);
+void isa_halt(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
