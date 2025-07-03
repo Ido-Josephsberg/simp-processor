@@ -11,6 +11,7 @@
 
 #define DISK_SECTORS 128            // Number of sectors in hard disk           --> Remove this if there's a disk file to include here
 #define DISK_ROWS 128               // Number of rows in hard disk's sector     --> Remove this if there's a disk file to include here
+#define PIXEL_PER_ROW_COL 256 // Number of pixels per row/column - monitor file
 
 typedef struct Simulator {
     bool is_running;
@@ -22,6 +23,7 @@ typedef struct Simulator {
     int32_t memory[MEMORY_SIZE];                // Memory array
     int32_t cycles;                             // Cycle count
     int32_t disk[DISK_SECTORS][DISK_ROWS];      // Hard disk represented as a 2D array
+	int8_t monitor[PIXEL_PER_ROW_COL][PIXEL_PER_ROW_COL]; // Monitor represented as a 2D array of pixels
 	DynamicString trace_str, hwregtrace_str, leds_str, seg7display_str;    // Dynamic strings for output files.
 } Simulator;
 
