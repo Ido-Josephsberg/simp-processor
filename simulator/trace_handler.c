@@ -56,7 +56,7 @@ int write_trace_file_wrapper(Simulator* sim, output_paths* paths) {
 
 	//write the trace string content to the file
 	if (write_str_to_file(trace_file, trace_string) != 0) {
-		printf("Error writing memory content to file %s\n", trace_path);
+		printf("Error writing trace data to file %s\n", trace_path);
 		fclose(trace_file);
 		return -1; // Return error code
 	}
