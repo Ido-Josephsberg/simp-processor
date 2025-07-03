@@ -7,9 +7,6 @@
 /////////////////////////////////////////// [TODO] ////////////////////////////////////////////////////////////////////////////////
 // Todos:
 // 		* implement the cycles counter logic here
-// 
-//      * Unfinished functions and TODOs:
-//          1. write_cycles_file_wrapper - Implement the logic to extract the cycles counter from the simulator
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -24,9 +21,8 @@ int write_cycles_file_wrapper(Simulator* sim, output_paths* paths) {
         printf("Error opening file %s for writing\n", cycles_path);
         return -1; // Return error code
     }
-    //*TODO: Implement the logic to extract the cycles number from the simulator.
-    // consider if it needs to be int32_t. if int32-t, then change in write_num_to_file as well
-    int cycles_num = "### Example num need to implement real one"; // Placeholder for the actual num extraction logic
+    
+    int32_t cycles_num = sim->cycles;
 
     //write the cycles content to the file
     if (write_num_to_file(cycles_file, cycles_num) != 0) {
