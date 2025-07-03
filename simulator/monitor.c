@@ -43,9 +43,9 @@ int write_monitor_files_wrapper(Simulator* sim, output_paths* paths) {
     }
 
     //TODO: need to check if writing into monitor yuv and monitor txt is the same or not.
-    //write the monitor string content to the YUV file (since monitor is a string, we will write it the same for a binary file)
-    if (write_str_to_file(monitor_yuv_file, monitor) != 0) {
-        printf("Error writing memory content to file %s\n", monitor_yuv_path);
+    //write the monitor content to the YUV file using the appropriate function for 2D arrays
+    if (write_monitor_content_to_file(monitor_yuv_file, monitor) != 0) {
+        printf("Error writing monitor content to file %s\n", monitor_yuv_path);
         fclose(monitor_yuv_file);
         return -1; // Return error code
     }
