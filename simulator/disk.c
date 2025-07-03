@@ -7,7 +7,7 @@
 
 int write_diskout_file_wrapper(Simulator* sim, output_paths* paths) {
 
-    char* diskout_path = paths->display7seg_path;
+    char* diskout_path = paths->diskout_path;
 
     // Open the output file for writing
     FILE* diskout_file = checked_fopen(diskout_path, "w");
