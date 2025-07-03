@@ -1,12 +1,10 @@
-//#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #include <string.h>
 #include "simulator.h"
 #include "io_register.h"
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 // Initialize the io register array to zero
-void init_io_reg_array(Simulator* sim);
 void init_io_reg_array(Simulator* sim) {
     for (int i = 0; i < IO_REG_NUM; ++i) {
         sim->io_reg_array[i] = 0;
@@ -26,10 +24,8 @@ void get_io_reg_name(char* dst, io_reg_name reg_index) {
         "diskbuffer", "diskstatus", "reserved18", "reserved19", "monitoraddr", "monitordata", "monitorcmd"
     };
     // Only copy name to dst if index is valid
-    if (reg_index >= 0 && reg_index < IO_REG_NUM) {
-        strncpy(dst, hw_reg_names[reg_index], IO_REG_MAX_NAME_SIZE - 1);
-        dst[IO_REG_MAX_NAME_SIZE - 1] = '\0';
-    }
+    if (reg_index >= 0 && reg_index < IO_REG_NUM)
+        strncpy(dst, hw_reg_names[reg_index], IO_REG_MAX_NAME_SIZE);
 }
 
 int get_io_reg_length(io_reg_name reg_index) {
