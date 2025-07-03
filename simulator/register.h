@@ -31,6 +31,7 @@ typedef enum {
 } reg_name;
 
 // Register Related Functions
+void init_reg_array(Simulator* sim);
 int32_t read_register(Simulator* sim, reg_name reg);
 void write_register(Simulator* sim, reg_name reg, int32_t value);
 void write_register_imm(Simulator* sim, int32_t value);
