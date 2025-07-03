@@ -141,12 +141,12 @@ int write_memory_content_to_file(FILE* file, uint32_t* memory) {
 	return 0;
 }
 
-int write_disk_content_to_file(FILE* file, uint32_t** disk) {
+int write_disk_content_to_file(FILE* file, uint32_t disk[][DISK_ROWS]) {
 	/*
 	 @brief: This function writes the content of a diskout 2D array to a file in 8-digit zero-padded hexadecimal format.
 			 - it writes the full diskout content, whether it is zero or not.
 	 @param: file - pointer to the file where the diskout content will be written.
-	 @param: diskout - a pointer to a 2D array of unsigned 32-bit integers representing the diskout content.
+	 @param: disk - a 2D array of unsigned 32-bit integers representing the diskout content.
 	 @param: diskout_size - the size of the diskout array in bytes.
 	 @return: int - returns 0 on success, or -1 if an error occurs (e.g., if the file cannot be opened or written to).
 	 */
