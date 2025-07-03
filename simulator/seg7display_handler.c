@@ -45,7 +45,7 @@ int write_display7seg_file_wrapper(Simulator* sim, output_paths* paths) {
 
 	//write the trace string content to the file
 	if (write_str_to_file(display7seg_file, display7seg_string) != 0) {
-		printf("Error writing memory content to file %s\n", display7seg_path);
+		printf("Error writing 7-segment display trace string to file %s\n", display7seg_path);
 		fclose(display7seg_file);
 		return -1; // Return error code
 	}
