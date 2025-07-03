@@ -63,7 +63,7 @@ int write_hwregtrace_file_wrapper(Simulator* sim, output_paths* paths) {
 
 	//write the trace string content to the file
 	if (write_str_to_file(hwregtrace_file, hwregtrace_string) != 0) {
-		printf("Error writing memory content to file %s\n", hwregtrace_path);
+		printf("Error writing hardware register trace to file %s\n", hwregtrace_path);
 		fclose(hwregtrace_file);
 		return -1; // Return error code
 	}
