@@ -127,7 +127,6 @@ int write_memory_content_to_file(FILE* file, uint32_t* memory) {
 	int32_t last_non_zero_line = 0;
 	
 	for (int32_t i = 0; i < MEMORY_SIZE; i++) { 
-		printf("%d\n", i); //DEBUG
 		if (memory[i] != 0) {
 			last_non_zero_line = i;
 		}
