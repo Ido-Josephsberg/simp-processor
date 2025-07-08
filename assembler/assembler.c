@@ -8,15 +8,13 @@
 #include "assembler.h"
 #include "file_handler.h"
 
-////////////////////////// TODO ////////////////////////////////////
-//  # If there is ----------------------------> please take a look
-////////////////////////////////////////////////////////////////////
-
 static bool is_label_instruction_inline(char* colon_pos) {
 	/*
-  Check if the label instruction is in the same line or one below it.
-  If it is in the same line, return true, otherwise return false.
-  */
+	 Check if the label instruction is inline with an instruction.
+	 A label instruction is inline if it has an instruction after the colon.
+	 @param: colon_pos - a pointer to the position of the colon in the assembly string
+	 @return: bool - true if it is inline, false otherwise
+	 */
 	if (colon_pos == NULL) {
 		return false;
 	}
@@ -31,6 +29,12 @@ static bool is_label_instruction_inline(char* colon_pos) {
 }
 
 static void update_label_address_dict(Label* label_dict_arg,char* label_name, uint32_t label_address) {
+	/*
+	 Update the label dictionary with the label name and address.
+	 @param: label_dict_arg - pointer to the Label struct to update
+	 @param: label_name - string representing the label name
+	 @param: label_address - address of the label
+	 */
 	strcpy(label_dict_arg->label_name, label_name);
 	label_dict_arg->label_address = label_address;
 }
@@ -38,7 +42,7 @@ static void update_label_address_dict(Label* label_dict_arg,char* label_name, ui
 static bool is_label_caller_line(char* asm_str) {
 	/*
 	 Check if the given assembly string is a label caller line.
-	 A label caller line is defined as a line that contains a label followed by an instruction.
+	 A label caller line defined as a line that contains label in the imm field, which is the last argument in the instruction.
 	 @param: asm_str - a pointer to the assembly string to check
 	 @return: bool - true if it is a label caller line, false otherwise
 	 */
@@ -58,7 +62,7 @@ static bool is_label_caller_line(char* asm_str) {
 static bool is_R_line(char* asm_str) {
 	/*
 	Check if the given assembly string is an R-type instruction line.
-
+	An R-type instruction line is defined as a line that has a comma before the immediate value (which is an int in R type).
 	@param: asm_str - a pointer to the assembly string to check
 	@return: bool - true if it is an R-type instruction line, false otherwise
 	*/
@@ -67,23 +71,23 @@ static bool is_R_line(char* asm_str) {
 	}
 	char* last_comma = strrchr(asm_str, ',');
 	if (last_comma != NULL) {
-		char* imm_arg = last_comma + 1;
+		char* imm_str_ptr = last_comma + 1;
 
-		while (*imm_arg == ' ' || *imm_arg == '\t') {
-			imm_arg++; // Skip whitespace
+		int32_t imm_num = -1; // Initialize immediate value
+		if (parse_number(imm_str_ptr, &imm_num) != 0) { // Check if the immediate value is valid and assign it to imm_num
+			printf("Error (line_handler): Invalid immediate value in R-type instruction: %s\n", imm_str_ptr);
 		}
-		if (parse_number(*imm_arg) == 0) {
-			// Decimal: skip leading zeros
-			while (*imm_arg == '0') imm_arg++;
-			// If nothing left, or only whitespace, it's zero
-			return *imm_arg == '\0' || isspace((unsigned char)*imm_arg);
-		}
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
 static int set_Imm32_line_struct(Line* line, char* label_name) {
 	/*
-	 Set the Line struct for an Imm32 instruction.
+	 Set the Line struct for an Imm32 line.
 	 @param: line - pointer to the Line struct to fill with parsed data
 	 @param: label_name - string representing the label name
 	 @return: int - return 0 if successful, -1 if error occurred
@@ -101,6 +105,11 @@ static int set_Imm32_line_struct(Line* line, char* label_name) {
 }
 
 static uint32_t R_line_to_hex(const Line* line) {
+	/*
+	 Convert an R line to its corresponding hexadecimal representation.
+	 @param: line - pointer to the Line struct representing the R line
+	 @return: uint32_t - the hexadecimal representation of the R line
+	 */
 	uint32_t hex = 0;
 	hex |= ((line->opcode & 0xFF) << 24);
 	hex |= ((line->rd & 0x0F) << 20);
@@ -113,6 +122,11 @@ static uint32_t R_line_to_hex(const Line* line) {
 }
 
 static uint32_t Imm32_line_to_hex(const Line* line) {
+	/*
+	 Convert an Imm32 line to its corresponding hexadecimal representation.
+	 @param: line - pointer to the Line struct representing the Imm32 line
+	 @return: uint32_t - the hexadecimal representation of the Imm32 line
+	 */
 	return (line->imm32 & 0xFFFFFFFF);
 }
 
@@ -153,7 +167,6 @@ int first_pass(FILE* asm_program, Line* line_arr, Label* label_dict, int* asm_li
 		}
 
 	/*This section handles Label addresses - Finds rows that are the destination of a called Label*/
-		
 		char* colon_pos = strchr(trimmed_asm_str, ':');
 		// Check asm_row_str is Label instruction line that doesn't have an instruction after it (in the same line e.g. "LOOP:" and nothing more)
 		if (colon_pos != NULL) {
@@ -164,24 +177,24 @@ int first_pass(FILE* asm_program, Line* line_arr, Label* label_dict, int* asm_li
 			strncpy(label_name_str, trimmed_asm_str, len);
 			label_name_str[len] = '\0';
 
-			// Check if the label is NOT inline with an instruction 
+			// Check if the label is NOT inline with an instruction. If so, it is a label-only line
 			if (!(is_label_instruction_inline(colon_pos))) {
-
-				// consider not to do void but to handle warnings -----------------------------------------> NOT sure about the argument send sending line_index and not the address itself))
+				
+				// Update the label dictionary array with the label name and address
 				update_label_address_dict(&(label_dict[label_dict_index]), label_name_str, line_index);  
 				label_dict_index++; // Increment label dictionary index for next label
 
-				//skip line that is label only (doesn't contain an instruction)
+				//Skip line that is label only (doesn't contain an instruction) - done by not incrementing line_index
 				continue;
 			}
 
 			else // Label is inline with an instruction
 			{
-				// consider not to do void but to handle warnings -----------------------------------------> NOT sure about the argument send sending line_index and not the address itself))
+				// Update the label dictionary array with the label name and address
 				update_label_address_dict(&(label_dict[label_dict_index]), label_name_str, line_index);
 				label_dict_index++; // Increment label dictionary index for next label
 
-				// update the trimmed_asm_str to start after the label name for being parsed by asm instruction format = opcode $rd, $rs, $rt, imm8
+				// Update the trimmed_asm_str to start after the label name for being parsed by asm instruction format = opcode $rd, $rs, $rt, imm8
 				trimmed_asm_str = colon_pos + 1; // Move past the colon
 
 				// Trim leading whitespace
@@ -193,7 +206,6 @@ int first_pass(FILE* asm_program, Line* line_arr, Label* label_dict, int* asm_li
 	/*end Label dest section*/
 
 	/*This section distinguish different Line Type*/
-
 		// checks if .word line:
 		if (strncmp(trimmed_asm_str, ".word", 5) == 0) {
 			line_arr[line_index].type = WORD; // Set the line type to WORD
@@ -260,6 +272,7 @@ int first_pass(FILE* asm_program, Line* line_arr, Label* label_dict, int* asm_li
 				// Set the Imm32 line struct for the next line
 				line_arr[line_index + 1].type = Imm32; // Set the line type to Imm32
 				line_arr[line_index + 1].imm32 = line_arr[line_index].imm32; // Copy the imm32 value from the R line
+				strncpy(line_arr[line_index + 1].called_label, R_TYPE_NO_LABEL, MAX_LABEL_NAME_LENGTH);
 				line_index += 2; // Increment line index for the opcode line (two lines are used for Label_call instruction)
 			}
 			else {
@@ -273,20 +286,22 @@ int first_pass(FILE* asm_program, Line* line_arr, Label* label_dict, int* asm_li
 		}
 		
 	}
-	*asm_line_count = line_index + 1;
-	*label_count = label_dict_index + 1;
+	*asm_line_count = line_index;
+	*label_count = label_dict_index;
 	return 0; // or -1 on error
 }
 
 int second_pass(Line* line_arr, int line_count, Label* label_dict, int label_count, uint32_t* memin, unsigned int* word_is_zero_location) {
 	/*
-	 Perform the second pass of the assembler to fill the imm32 field in Imm32 lines.
-	 @param: line_arr - pointer to the array of Line structs
-	 @param: line_count - number of lines in the line array
-	 @param: label_dict - pointer to the array of Label structs
-	 @param: label_count - number of labels in the label dictionary
-	 @return: int - return 0 if successful, -1 if error occurred
-	 */
+	 Perform the second pass of the assembler to fill the imm32 field in Imm32 lines and convert lines to hexadecimal representation.
+	 @param line_arr: Pointer to the array of Line structs containing parsed assembly lines.
+	 @param line_count: Number of lines in the line array.
+	 @param label_dict: Pointer to the array of Label structs containing label addresses.
+	 @param label_count: Number of labels in the label dictionary.
+	 @param memin: Pointer to the memory input array to fill with machine code.
+	 @param word_is_zero_location: Pointer to an array to track if a word line data is zero.
+	 @return: int - Returns 0 on success, -1 on error.
+	*/
 	if (line_arr == NULL || label_dict == NULL || line_count <= 0 || label_count <= 0 || word_is_zero_location == NULL) {
 		return -1; // Error: Invalid input
 	}
@@ -298,7 +313,6 @@ int second_pass(Line* line_arr, int line_count, Label* label_dict, int label_cou
 				// If it does, the next line should be an Imm32 line
 				if (i + 1 >= line_count || line_arr[i + 1].type != Imm32) {
 					printf("Error (assembler): Expected Imm32 line after R-type instruction with bigimm set to 1 at line %d\n", i);
-					printf("DEBUG Error (assembler): Check first pass set to 1 at line %d\n", i);
 					return -1; // Error: Expected Imm32 line after R-type instruction with bigimm set to 1
 				}
 			}
@@ -307,7 +321,7 @@ int second_pass(Line* line_arr, int line_count, Label* label_dict, int label_cou
 
 		else if (line_arr[i].type == Imm32) {
 			// If the line is an Imm32 line, check if it has a label
-			if (line_arr[i].called_label != R_TYPE_NO_LABEL) {
+			if (strncmp(line_arr[i].called_label, R_TYPE_NO_LABEL, MAX_LABEL_NAME_LENGTH) != 0) {
 				// Find the corresponding label in the label dictionary
 				bool label_found = false;
 				for (int j = 0; j < label_count; j++) {
@@ -322,8 +336,9 @@ int second_pass(Line* line_arr, int line_count, Label* label_dict, int label_cou
 					printf("Error (assembler): Label '%s' not found in label dictionary at line %d\n", line_arr[i].called_label, i);
 					return -1; // Error: Label not found in label dictionary
 				}
-				memin[i] = Imm32_line_to_hex(&(line_arr[i])); // Convert the Imm32 line to hex and store it in the memin array
 			}
+			// Convert it to hex and store it in the memin array
+			memin[i] = Imm32_line_to_hex(&(line_arr[i])); // Convert the Imm32 line to hex and store it in the memin array
 		}
 
 		else if (line_arr[i].type == WORD) {
@@ -338,7 +353,7 @@ int second_pass(Line* line_arr, int line_count, Label* label_dict, int label_cou
 
 		else if (line_arr[i].type == Label_call) {
 			// If the line is an Label_call instruction, check if it has a bigimm set to 1
-			if (line_arr[i].bigimm != 1 || line_arr[i].called_label == R_TYPE_NO_LABEL || i + 1 >= line_count || line_arr[i + 1].type != Imm32) {
+			if (line_arr[i].bigimm != 1 || strncmp(line_arr[i].called_label, R_TYPE_NO_LABEL, MAX_LABEL_NAME_LENGTH) == 0 || i + 1 >= line_count || line_arr[i + 1].type != Imm32) {
 				printf("Error (assembler): Line instruction at line %d doesn't meet crateria for Label_call instruction at line\n", i);
 				return -1; // Error: Line instruction doesn't meet criteria for Label_call instruction
 			}

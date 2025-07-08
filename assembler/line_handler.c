@@ -7,39 +7,52 @@
 #include <ctype.h>
 #include "line_handler.h"
 
-#define MIN_8BIT_VALUE -128
-#define MAX_8BIT_VALUE 127
+int parse_number(const char* str, int32_t* out_num) {
+	/*
+	 Parse a number from a string and store it in out_num.
+	 The string can be in decimal or hexadecimal format (e.g., "42" or "0x2A").
+	 @param: str - a pointer to the string containing the number
+	 @param: out_num - a pointer to an int32_t variable to store the parsed number
+	 @return: int - return 0 if successful, -1 if error occurred
+	 */
+	if (!str || !out_num) return -1;
 
-///////////////////////////////////// TODO ///////////////////////////////////////////////
-//	1. Solved issues / questions in lines marked with "TODO" or ---------------------->	
-// 
-//	questions:
-// 			1. word.data - can be negative? -- FOR NOW I ASSUME IT CAN BE NEGATIVE
-//
-//////////////////////////////////////////////////////////////////////////////////////////
+	// Skip leading whitespace, tabs, and newlines
+	while (*str == ' ' || *str == '\t' || *str == '\n') {
+		str++;
+	}
 
-int parse_number(const char* str) {
-	// Note: if strlol() fails to convert the string, it returns 0.
-	// This uniqe case is being checked outside this function - after it is called.
+	// Check for empty string after whitespace
+	if (*str == '\0') return -1;
 
-	if (str != NULL && (str[0] == '0') && (str[1] == 'x' || str[1] == 'X')) {
-		// Hexadecimal
-		return strtol(str, NULL, 16);
+	char* endptr = NULL;
+	long value = 0;
+
+	if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X')) {
+		value = strtoul(str, &endptr, 16);
 	}
 	else {
-		// Always decimal, even if leading zero
-		return strtol(str, NULL, 10);
+		value = strtoul(str, &endptr, 10);
 	}
+
+	// Check if conversion succeeded and no invalid trailing characters (except whitespace)
+	if (endptr == str) return -1;
+	while (*endptr == ' ' || *endptr == '\t' || *endptr == '\n') endptr++;
+	if (*endptr != '\0') return -1;
+
+	*out_num = (int32_t)value;
+	return 0;
 }
 
 static int init_word_struct(Word* word, char* addr_data_str) {
+	/*
+	 Initialize a Word struct from a string containing address and data.
+	 @param: word - pointer to the Word struct to fill
+	 @param: addr_data_str - string containing address and data (e.g., "0x1000 42")
+	 @return: int - return 0 if successful, -1 if error occurred
+	 */
     if (word == NULL || addr_data_str == NULL) {
         return -1; // Error: Invalid input
-    }
-
-    // Skip leading whitespace
-    while (*addr_data_str == ' ' || *addr_data_str == '\t') {
-        addr_data_str++;
     }
 
     // Extract address and data as separate strings
@@ -51,19 +64,20 @@ static int init_word_struct(Word* word, char* addr_data_str) {
     }
 
     // Parse address
-    uint32_t address = parse_number(address_str);
-    if (address == 0 && address_str[0] != '0') {
+	uint32_t address;
+	 if (parse_number(address_str,&address) != 0) {
         printf("Error (line_handler): Invalid address in.word instruction : % s\n", address_str);
         return -1;
     }
 
     // Parse data
-    int32_t data = parse_number(data_str); //------------------------------------------------------------> CHECK IF DATA CAN BE NEGATIVE
-    if (data == 0 && data_str[0] != '0') {
+    int32_t data;
+    if (parse_number(data_str, &data) != 0) {//(data == 0 && data_str[0] != '0') {
         printf("Error (line_handler): Invalid data in .word instruction: %s\n", data_str);
         return -1;
     }
 
+	// Initialize the Word struct
     word->address = address;
     word->data = data;
     return 0;
@@ -142,6 +156,7 @@ static int init_opcode_and_registers(char* asm_str, Line* line) {
 	 @param: line - pointer to Line struct to fill
 	 @return: 0 if successful, -1 if error
 	 */
+ 
 	if (asm_str == NULL || line == NULL) return -1;
 
 	char* token = strtok(asm_str, " ,\t");
@@ -183,7 +198,9 @@ int parse_instruction_to_line(char* asm_str, Line* line, LineType type) {
 
 	 @return: int - return 0 if successful, -1 if error occurred
 	 */
-
+	char asm_str_cpy[MAX_ASM_LINE_LENGTH];
+	strncpy(asm_str_cpy, asm_str, MAX_ASM_LINE_LENGTH - 1);
+	
 	if (line == NULL || asm_str == NULL) {
 		printf("Error: Invalid input to parse_instruction_to_line\n");
 		return -1; // Error: Invalid input (printed error outside the function)
@@ -206,7 +223,7 @@ int parse_instruction_to_line(char* asm_str, Line* line, LineType type) {
 	// Handle label callerlabel caller line:
 	if (type == Label_call) {
 		// Initialize opcode and registers
-		if (init_opcode_and_registers(asm_str, line) < 0) {
+		if (init_opcode_and_registers(asm_str_cpy, line) < 0) {
 			printf("Error: Invalid label caller instruction format: %s\n", asm_str);
 			return -1; // Error: Invalid label caller instruction format
 		}
@@ -254,7 +271,7 @@ int parse_instruction_to_line(char* asm_str, Line* line, LineType type) {
 	// Handle R-type instruction:
 	else if (type == R) {
 		// Initialize opcode and registers
-		if (init_opcode_and_registers(asm_str, line) < 0) {
+		if (init_opcode_and_registers(asm_str_cpy, line) < 0) {
 			printf("Error (line_handler: Invalid R instruction format: %s\n", asm_str);
 			return -1; // Error: Invalid label caller instruction format
 		}
@@ -263,36 +280,23 @@ int parse_instruction_to_line(char* asm_str, Line* line, LineType type) {
 		line->reserved = 0;
 
 		char* last_comma = strrchr(asm_str, ',');
-		int imm = 0; // Initialize immediate value
+		int32_t imm_num = -1; // Initialize immediate value
 
+		// Check if there is a comma in the instruction string
 		if (last_comma != NULL) {
-			char* imm_arg = last_comma + 1;
-
-			while (*imm_arg == ' ' || *imm_arg == '\t') {
-				imm_arg++; // Skip whitespace
+			char* imm_str_ptr = last_comma + 1;
+			
+			// Extract the immediate value from the string after the last comma
+			if (parse_number(imm_str_ptr, &imm_num) != 0) {
+				printf("Error (line_handler): Invalid immediate value in R-type instruction: %s\n", imm_str_ptr);
+				return -1; // Error: Invalid immediate value
 			}
-			imm = parse_number(*imm_arg);
-
-			// Check if the immediate value is zero or its representation is invalid from strlot failure
-			if (imm == 0) {
-				int i = 0;		// Index for skipping leading zeros
-				if (imm_arg[1] == 'x' || imm_arg[1] == 'X') {
-					// Hex: skip leading zeros
-					i = 2; // Skip "0x" or "0X"
-				}
-				// Decimal: skip leading zeros
-				while (*(imm_arg + i) == '0') imm_arg++;
-
-				// NOT(If nothing left, or only whitespace, it's zero)
-				if (!(*imm_arg == '\0' || isspace((unsigned char)*imm_arg))) {
-					printf("Error: Invalid immediate value in R-type instruction: %s\n", imm_arg);
-					return -1; // Error: Invalid immediate value
-				}
-			}
-			if (imm >= MIN_8BIT_VALUE && imm <= MAX_8BIT_VALUE) {
+			
+			// Check if the immediate value is within the valid range for 8-bit or 32-bit immediate
+			if (imm_num >= MIN_8BIT_VALUE && imm_num <= MAX_8BIT_VALUE) {
 				// Set imm8 the short immediate value in the line struct 
 				line->bigimm = 0; // Set bigimm to 0 for R-type instruction
-				line->imm8 = (uint8_t)imm;
+				line->imm8 = (uint8_t)imm_num;
 				line->imm32 = 0;  // Set imm32 to 0 - it is not used in this R-type instruction
 				strcpy(line->called_label, R_TYPE_NO_LABEL); // Set called_label to a special value indicating no label is used
 			}
@@ -300,12 +304,10 @@ int parse_instruction_to_line(char* asm_str, Line* line, LineType type) {
 				// Set imm32 the long immediate value in the line struct
 				line->bigimm = 1; // Set bigimm to 1 for R-type instruction
 				line->imm8 = 0;   // Set imm8 to 0 - it is not used in this R-type instruction
-				line->imm32 = (uint32_t)imm;
+				line->imm32 = (uint32_t)imm_num;
 				strcpy(line->called_label, R_TYPE_NO_LABEL); // Set called_label to a special value indicating no label is used
-			}
-			
+			}		
 		}
-
 		return R; // Successfully parsed R-type instruction
 	}
 
