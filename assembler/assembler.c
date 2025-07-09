@@ -162,7 +162,7 @@ int first_pass(FILE* asm_program, Line* line_arr, Label* label_dict, int* asm_li
 		}
 		
 		// Check if the line is empty after trimming
-		if (*trimmed_asm_str == '\0') {
+		if (*trimmed_asm_str == '\0' || *trimmed_asm_str == '\n') {
 			continue; // Skip empty lines
 		}
 
