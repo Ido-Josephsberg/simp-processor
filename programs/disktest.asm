@@ -1,5 +1,3 @@
-.word 1024 0                # flag = 0 (synchronization flag for interrupts)
-
 init:
     add $t0, $zero, $imm, 1         # $t0 = 1
     out $zero, $zero, $t0, 1        # IORegister[1] = 1 (enable irq1)
@@ -15,10 +13,9 @@ init:
     out $zero, $zero, $a3, 14       # IORegister[14] = $a3 (diskcmd = 1)
 
 wait_sector0:
-    add $s0, $zero, $imm, 1024      # $s0 = 1024 (&flag)
-    lw  $t2, $s0, $zero, 0          # $t2 = MEM[flag]
+    in  $t2, $zero, $zero, 17       # $t2 = IORegister[17] (diskstatus)
     beq $zero, $t2, $zero, wait_sector0 # if $t2 == 0, loop
-    sw  $s0, $zero, $zero, 0        # MEM[flag] = 0
+    out $zero, $zero, $zero, 17     # IORegister[17] = 0 (clear diskstatus)
 
     add $a1, $zero, $t0, 0          # $a1 = 1 (start with sector1)
 sector_sum_loop:
@@ -28,10 +25,9 @@ sector_sum_loop:
     out $zero, $zero, $t0, 14       # IORegister[14] = 1 (read)
 
 wait_sectorX:
-    add $s0, $zero, $imm, 1024      # $s0 = 1024 (&flag)
-    lw  $t2, $s0, $zero, 0          # $t2 = MEM[flag]
+    in  $t2, $zero, $zero, 17       # $t2 = IORegister[17] (diskstatus)
     beq $zero, $t2, $zero, wait_sectorX # if $t2 == 0, loop
-    sw  $s0, $zero, $zero, 0        # MEM[flag] = 0
+    out $zero, $zero, $zero, 17     # IORegister[17] = 0 (clear diskstatus)
 
     add $a0, $zero, $zero, 0        # $a0 = i = 0
 sum_words_loop:
@@ -55,15 +51,13 @@ sum_words_loop:
     out $zero, $zero, $t0, 14       # IORegister[14] = $t0 (diskcmd = 2)
 
 wait_write:
-    add $s0, $zero, $imm, 1024      # $s0 = 1024 (&flag)
-    lw  $t2, $s0, $zero, 0          # $t2 = MEM[flag]
+    in  $t2, $zero, $zero, 17       # $t2 = IORegister[17] (diskstatus)
     beq $zero, $t2, $zero, wait_write # if $t2 == 0, loop
-    sw  $s0, $zero, $zero, 0        # MEM[flag] = 0
+    out $zero, $zero, $zero, 17     # IORegister[17] = 0 (clear diskstatus)
 
     halt $zero, $zero, $zero, 0     # End of program
 
 irq_handler:
-    add $s0, $zero, $imm, 1024      # $s0 = 1024 (&flag)
     add $t0, $zero, $imm, 1         # $t0 = 1
-    sw  $s0, $zero, $t0, 0          # MEM[flag] = 1
+    out $zero, $zero, $t0, 17       # IORegister[17] = 1 (set diskstatus)
     reti $zero, $zero, $zero, 0     # Return from interrupt
