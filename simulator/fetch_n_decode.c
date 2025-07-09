@@ -118,7 +118,6 @@ void fetch_n_decode_loop(Simulator* sim) {
 		isa_jal, isa_lw, isa_sw, isa_reti, isa_in, isa_out, isa_halt };
 	
 	while (sim->is_running) {
-		printf("cycle: %08X pc: %03X instruction: %08X  reg_14: %08X\n", sim->cycles, sim->pc, sim->inst, sim->reg_array[14]);
 		//if (sim->cycles == sim->)
 		// TODO: REMOVE ME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		if (!sim->bigimm) {
@@ -135,9 +134,6 @@ void fetch_n_decode_loop(Simulator* sim) {
 
 			// Fetch the instruction
 			fetch_instruction(sim);
-			if (sim->cycles == 117) {
-				printf("Debug\n");
-			}
 			decode_instruction(sim);
 			if (!sim->bigimm) {
 				// TODO: remove this debug print statement in production code!!!!!!!!!!!!!!!!
