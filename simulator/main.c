@@ -7,15 +7,21 @@
 #include "isa_func.h"
 #include "simulator.h"
 #include "files_handler.h"
+#define True 1
+#define False 0
+#include "io_register.h"
+#include "monitor.h"
+#include "fetch_n_decode.h"
+#include "trace_handler.h"
+#include "hwregtrace_handler.h"
+#include "leds_handler.h"
+#include "seg7display_handler.h"
+#include "cycles.h"
+#include "disk.h"
+#include "monitor.h"
 
 
-/////////////////////////////////////////// [TODO] /////////////////////////////////////////
-// Todos:
-//		
-//		* Continue implementing the main function according to the block diagram.
-//
-//
-/////////////////////////////////////////// [TODOS] /////////////////////////////////////////
+
 
 int main(int argc, char** argv) {
 	// TODO: check if assuming input correctness is allowed.
@@ -27,16 +33,22 @@ int main(int argc, char** argv) {
 	// Initialize input and output paths
 	input_paths in_paths;
 	output_paths out_paths;
-
 	init_input_paths(&in_paths, argv);
 	init_output_paths(&out_paths, argv);
 
-	//Initialize the simulator fileds
+	// Initialize the simulator object.
 	Simulator sim;
-	
-	// Allocate memory for the simulator
-	
-	// Comtinue with the main func addording to the block diagram. 
+	simulator_init(&sim, in_paths, out_paths);
+	fetch_n_decode_loop(&sim);
+	write_trace_file_wrapper(&sim, &out_paths);
+	write_hwregtrace_file_wrapper(&sim, &out_paths);
+	write_cycles_file_wrapper(&sim, &out_paths);
+	write_leds_file_wrapper(&sim, &out_paths);
+	write_display7seg_file_wrapper(&sim, &out_paths);
+	write_diskout_file_wrapper(&sim, &out_paths);
+	write_monitor_files_wrapper(&sim, &out_paths, sim.max_monitor_pixel);
+	write_memout_file_wrapper(&sim, &out_paths);
+	write_regout_file_wrapper(&sim, &out_paths);
 
 	return 0;
 }
