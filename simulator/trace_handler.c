@@ -1,7 +1,9 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <string.h>
+#include "macros.h"
 #include "simulator.h"
-#include "sim_helpers.h"
+#include "write_helpers.h"
 #include "trace_handler.h"
-
 
 
 
@@ -14,8 +16,10 @@ static void add_curr_data_to_trace(Simulator* sim) {
 	// Declare a string to hold the new line and a string to hold the formatted register value (1 for space + 1 for null terminator).
 	char new_line[TRACE_LINE_SIZE];
 
+	int pc = sim->bigimm ? sim->pc - 1 : sim->pc;
+
 	// Insert to the new line string the cycle written with CYCLE_NUM_OF_DIGITS hex digits, pc with PC_NUM_OF_DIGITS hex digits and instruction with INST_NUM_OF_DIGITS hex digits.
-	sprintf(new_line, "%0" MACRO_TO_STR(CYCLE_NUM_OF_DIGITS) "X %0" MACRO_TO_STR(PC_NUM_OF_DIGITS) "X %0" MACRO_TO_STR(INST_NUM_OF_DIGITS) "X", sim->cycles, sim->pc, sim->inst);
+	sprintf(new_line, "%0" MACRO_TO_STR(CYCLE_NUM_OF_DIGITS) "X %0" MACRO_TO_STR(PC_NUM_OF_DIGITS) "X %0" MACRO_TO_STR(INST_NUM_OF_DIGITS) "X", sim->cycles, pc, sim->inst);
 	// Get the current position in the new line string
 	char* cur_pos = new_line + strlen(new_line);
 	// Append the register values to the new line string.
@@ -27,7 +31,7 @@ static void add_curr_data_to_trace(Simulator* sim) {
 	sprintf(cur_pos, "\n");
 
 	// Append the new line to the trace string.
-	strcat(sim->trace_str.data, new_line);
+	strcat(sim->trace_str->data, new_line);
 }
 
 void update_trace(Simulator* sim) {
@@ -37,7 +41,29 @@ void update_trace(Simulator* sim) {
 	*/
 
 	// Ensure that the trace_str has enough allocated memory to append new line.
-	ensure_str_capacity(&(sim->trace_str), TRACE_LINE_SIZE);
+	ensure_str_capacity(sim->trace_str, TRACE_LINE_SIZE);
 	// Update the trace string with the current cycle, pc, instruction, and register values.
 	add_curr_data_to_trace(sim);
+}
+
+int write_trace_file_wrapper(Simulator* sim, output_paths* paths) {
+	char* trace_path = paths->trace_path;
+	// Open the output file for writing
+	FILE* trace_file = checked_fopen(trace_path, "w");
+	if (trace_file == NULL) {
+		printf("Error opening file %s for writing\n", trace_path);
+		return -1; // Return error code
+	}
+	// Extract the trace string from the simulator.
+	char* trace_string = sim->trace_str->data;
+
+	// Write the trace string content to the file
+	if (write_str_to_file(trace_file, trace_string) != 0) {
+		printf("Error writing trace data to file %s\n", trace_path);
+		fclose(trace_file);
+		return -1; // Return error code
+	}
+
+	fclose(trace_file);
+	return 0;
 }

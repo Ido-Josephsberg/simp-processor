@@ -4,10 +4,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "sim_helpers.h" // DELETE AFTER IMPLEMENTING FILES PER FUNCTION.
+#include "macros.h"
 #include "write_helpers.h"
-#include "register.h"
-#include "memory.h"
 #include "simulator.h"
 
 /////////////////////////////////////////// [TODO] /////////////////////////////////////////
@@ -109,7 +107,7 @@ int write_registers_content_to_file(FILE* file, int32_t* reg_array) {
 	return 0;
 }
 
-int write_memory_content_to_file(FILE* file, uint32_t* memory) {
+int write_memory_content_to_file(FILE* file, uint32_t* memory, int maximum_address) {
 	/*
 	 @brief: This function writes the content of a memory array to a file in 8-digit zero-padded hexadecimal format.
 			 - relevant to functions: write_memout (1 in total)
@@ -123,17 +121,8 @@ int write_memory_content_to_file(FILE* file, uint32_t* memory) {
 	if (memory == NULL || file == NULL)
 		return -1; // Error: file pointer is NULL
 
-	// Find last non-zero line in memory /// I DONT THINK ITS NEEDED!!!
-	int32_t last_non_zero_line = 0;
-	
-	for (int32_t i = 0; i < MEMORY_SIZE; i++) { 
-		if (memory[i] != 0) {
-			last_non_zero_line = i;
-		}
-	}
-
 	// Write memory content to the file
-	for (int32_t i = 0; i <= last_non_zero_line; i++) {
+	for (int32_t i = 0; i <= maximum_address; i++) {
 		if (fprintf(file, "%08X\n", memory[i]) < 0) {
 			return -1; // fclose will be called outside the function.
 		}
@@ -168,7 +157,7 @@ int write_disk_content_to_file(FILE* file, uint32_t disk[][DISK_ROWS]) {
 	return 0;
 }
 
-int write_monitor_content_to_file(FILE* file, uint8_t** monitor) {
+int write_monitor_content_to_file(FILE* file, uint8_t monitor[][PIXEL_PER_ROW_COL], int max_pixel_index[], int is_yuv) {
 	/*
 	 @brief: This function writes the content of a monitor 2D array to a file in 8-digit zero-padded hexadecimal format.
 			 - it writes the full monitor content, whether it is zero or not.
@@ -182,10 +171,14 @@ int write_monitor_content_to_file(FILE* file, uint8_t** monitor) {
 	if (monitor == NULL || file == NULL) {
 		return -1; // Error: file pointer is NULL
 	}
-
+	int row_upper_bound = is_yuv ? PIXEL_PER_ROW_COL : max_pixel_index[0]; 
+	int col_upper_bound = PIXEL_PER_ROW_COL;
 	// Write disk content to the file
-	for (int i = 0; i < PIXEL_PER_ROW_COL; i++) {
-		for (int j = 0; j < PIXEL_PER_ROW_COL; j++) {
+	for (int i = 0; i <= row_upper_bound; i++) {
+		if (i == max_pixel_index[0] && !is_yuv) {
+			col_upper_bound = max_pixel_index[1] + 1; // Last row may not be full
+		}
+		for (int j = 0; j < col_upper_bound; j++) { 
 			// Write the number in 8-digit zero-padded hexadecimal format
 			if (fprintf(file, "%02X\n", monitor[i][j]) < 0) {
 				return -1; // fclose will be called outside the function.
