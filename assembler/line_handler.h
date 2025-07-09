@@ -5,14 +5,12 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#define MAX_ASM_LINE_LENGTH 500		//check it is enough for the line (or do i need a dynamic buffer?)
+#define MAX_MEM_LINES 4069			// memory depth is max 4096 lines.
 #define MAX_LABEL_NAME_LENGTH 50 // max length of label name
 #define R_TYPE_NO_LABEL "R-type no label" // label name for R-type instruction
-
-///////////////////////////////////// TODO /////////////////////////////////////
-//  # If there is ----------------------------> please take a look	
-//  # questions:
-// 		1. word.data - can be negative? -- FOR NOW I ASSUME IT CAN BE NEGATIVE
-////////////////////////////////////////////////////////////////////////////////
+#define MIN_8BIT_VALUE -128
+#define MAX_8BIT_VALUE 127
 
 typedef enum { // 4 bits for register code
 	zero,				//0
@@ -79,9 +77,9 @@ typedef struct Line {
 	uint8_t reserved : 3;			// 3 bits reserved for future use
 	uint8_t bigimm : 1;				// 1 bit flag for big immediate
 	// 4th byte:
-	uint8_t imm8;					// 1 hex, 8 bits for small immediate	
+	int8_t imm8;					// 1 hex, 8 bits for small immediate	
 	// elif Imm32
-	uint32_t imm32;					// 4 hex, 32 bits for large immediate
+	int32_t imm32;					// 4 hex, 32 bits for large immediate
 	// else Label
 	char called_label[MAX_LABEL_NAME_LENGTH];				// label struct for label lines
 	// if .word instruction
@@ -89,12 +87,7 @@ typedef struct Line {
 } Line;
 
 // Function declerations:
-
-int parse_number(const char* str);
-static int init_word_struct(Word* word, char* addr_data_str);
-static int get_register_code(const char* reg_str);
-static int get_opcode_code(const char* opcode_str);
-static int init_opcode_and_registers(char* asm_str, Line* line);
+int parse_number(const char* str, int32_t* out_num);
 int parse_instruction_to_line(char* asm_str, Line* line, LineType type);
 
 #endif // !LINE_H
