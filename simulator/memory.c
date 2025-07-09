@@ -1,8 +1,13 @@
 #include <stdint.h>
-#include "memory.h"
+#include "macros.h"
 #include "simulator.h"
 #include "write_helpers.h"
+#include "memory.h"
 
+void init_memory(Simulator* sim) {
+    // Initialize the memory to zero
+	memset(sim->memory, 0, sizeof(sim->memory));
+}
 
 int32_t read_memory(Simulator* sim, int32_t address) {
 	if (address < 0 || address >= MEMORY_SIZE) {
@@ -31,8 +36,8 @@ int write_memout_file_wrapper(Simulator* sim, output_paths* paths) {
         return -1; // Return error code
     }
 
-    //write the memory content to the file
-    if (write_memory_content_to_file(memout_file, sim->memory) != 0) {
+    // Write the memory content to the file
+    if (write_memory_content_to_file(memout_file, sim->memory, sim->max_memory_address) != 0) {
         printf("Error writing memory content to file %s\n", memout_path);
         fclose(memout_file);
         return -1; // Return error code

@@ -129,11 +129,13 @@
   <ItemGroup>
     <ClInclude Include="cycles.h" />
     <ClInclude Include="disk.h" />
-    <ClInclude Include="dynamic_str.h" />
+    <ClInclude Include="dynamic_mem.h" />
+    <ClInclude Include="fetch_n_decode.h" />
     <ClInclude Include="hwregtrace_handler.h" />
     <ClInclude Include="io_register.h" />
     <ClInclude Include="isa_func.h" />
     <ClInclude Include="leds_handler.h" />
+    <ClInclude Include="macros.h" />
     <ClInclude Include="memory.h" />
     <ClInclude Include="monitor.h" />
     <ClInclude Include="register.h" />
@@ -147,7 +149,8 @@
   <ItemGroup>
     <ClCompile Include="cycles.c" />
     <ClCompile Include="disk.c" />
-    <ClCompile Include="dynamic_str.c" />
+    <ClCompile Include="dynamic_mem.c" />
+    <ClCompile Include="fetch_n_decode.c" />
     <ClCompile Include="hwregtrace_handler.c" />
     <ClCompile Include="io_register.c" />
     <ClCompile Include="leds_handler.c" />

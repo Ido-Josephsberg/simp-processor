@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include "files_handler.h"
 
-#define REG_NUM 16
 
 // forward declaration of Simulator structure
 struct Simulator;

@@ -4,8 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define IO_REG_NUM 23
-#define IO_REG_MAX_NAME_SIZE 12
+
 
 // forward declaration of Simulator structure
 struct Simulator;

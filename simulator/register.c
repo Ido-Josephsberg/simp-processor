@@ -1,16 +1,14 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <stdint.h>
+#include <string.h>
 #include "simulator.h"
 #include "register.h"
 #include "write_helpers.h"
-#include "files_handler.h"
 
 // Initialize the register array to zero
 void init_reg_array(Simulator* sim) {
-    for (int i = 0; i < REG_NUM; i++) {
-        sim->reg_array[i] = 0;
-    }
+	memset(sim->reg_array, 0, sizeof(sim->reg_array));
 }
 
 // Read from any register

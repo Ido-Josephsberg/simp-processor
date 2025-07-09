@@ -1,8 +1,9 @@
 #define _CRT_SECURE_NO_WARNINGS
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
+#include "write_helpers.h"
 #include "monitor.h"
 
 /////////////////////////////////////////// [TODO] ////////////////////////////////////////////////////////////////////////
@@ -12,8 +13,12 @@
 //         2. write_monitor_file_wrapper - gaps: need to check if writing into .yuv & .txt are the same.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Initialize the monitor to zeros
+void init_monitor(Simulator* sim) {
+    memset(sim->monitor, 0, sizeof(sim->monitor));
+}
 
-int write_monitor_files_wrapper(Simulator* sim, output_paths* paths) {
+int write_monitor_files_wrapper(Simulator* sim, output_paths* paths, int max_monitor_pixel[]) {
 
     char* monitor_txt_path = paths->monitor_txt_path;
     char* monitor_yuv_path = paths->monitor_yuv_path;
@@ -32,11 +37,8 @@ int write_monitor_files_wrapper(Simulator* sim, output_paths* paths) {
         return -1; // Return error code
     }
 
-    // Extract the display7seg_string from the simulator.
-    uint8_t** monitor = sim->monitor;
-
     //write the monitor string content to the txt file
-    if (write_monitor_content_to_file(monitor_txt_file, monitor) != 0) {
+    if (write_monitor_content_to_file(monitor_txt_file, sim->monitor, max_monitor_pixel, 0) != 0) {
         printf("Error writing memory content to file %s\n", monitor_txt_path);
         fclose(monitor_txt_file);
         return -1; // Return error code
@@ -44,7 +46,7 @@ int write_monitor_files_wrapper(Simulator* sim, output_paths* paths) {
 
     //TODO: need to check if writing into monitor yuv and monitor txt is the same or not.
     //write the monitor content to the YUV file using the appropriate function for 2D arrays
-    if (write_monitor_content_to_file(monitor_yuv_file, monitor) != 0) {
+    if (write_monitor_content_to_file(monitor_yuv_file, sim->monitor, max_monitor_pixel, 1) != 0) {
         printf("Error writing monitor content to file %s\n", monitor_yuv_path);
         fclose(monitor_yuv_file);
         return -1; // Return error code

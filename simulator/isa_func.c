@@ -3,6 +3,19 @@
 #include "simulator.h"
 #include "isa_func.h"
 
+// Update the monitor with the pixel value read from the MONITORDATA register
+static void update_monitor(Simulator* sim, int32_t offset) {
+	int32_t row = offset / PIXEL_PER_ROW_COL;
+	int32_t col = offset % PIXEL_PER_ROW_COL;
+	int32_t pixel_value = read_io_reg(sim, MONITORDATA);
+	sim->monitor[row][col] = pixel_value;
+	if (row >= sim->max_monitor_pixel[0] && col > sim->max_monitor_pixel[1] && pixel_value){
+		// Update the maximum pixel position used in the monitor
+		sim->max_monitor_pixel[0] = row;
+		sim->max_monitor_pixel[1] = col;
+	}
+}
+
 // 0. Implementation of the "ADD" ISA instruction
 void isa_add(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	int32_t result = read_register(sim, rs) + read_register(sim, rt);
@@ -63,6 +76,8 @@ void isa_beq(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	if (read_register(sim, rs) == read_register(sim, rt)) {
 		// Branch taken, adjust the program counter (sim->pc)
 		sim->pc = read_register(sim, rd) & 0xfff;	// 12 bit mask for sim->pc
+		// Set the flag to indicate that the program counter has changed
+		sim->is_pc_changed = 1;
 	}
 }
 
@@ -71,6 +86,8 @@ void isa_bne(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	if (read_register(sim, rs) != read_register(sim, rt)) {
 		// Branch taken, adjust the program counter (sim->pc)
 		sim->pc = read_register(sim, rd) & 0xfff;	// 12 bit mask for sim->pc
+		// Set the flag to indicate that the program counter has changed
+		sim->is_pc_changed = 1;
 	}
 }
 
@@ -79,6 +96,8 @@ void isa_blt(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	if (read_register(sim, rs) < read_register(sim, rt)) {
 		// Branch taken, adjust the program counter (sim->pc)
 		sim->pc = read_register(sim, rd) & 0xfff;	// 12 bit mask for sim->pc
+		// Set the flag to indicate that the program counter has changed
+		sim->is_pc_changed = 1;
 	}
 }
 
@@ -87,6 +106,8 @@ void isa_bgt(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	if (read_register(sim, rs) > read_register(sim, rt)) {
 		// Branch taken, adjust the program counter (sim->pc)
 		sim->pc = read_register(sim, rd) & 0xfff;	// 12 bit mask for sim->pc
+		// Set the flag to indicate that the program counter has changed
+		sim->is_pc_changed = 1;
 	}
 }
 
@@ -95,6 +116,8 @@ void isa_ble(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	if (read_register(sim, rs) <= read_register(sim, rt)) {
 		// Branch taken, adjust the program counter (sim->pc)
 		sim->pc = read_register(sim, rd) & 0xfff;	// 12 bit mask for sim->pc
+		// Set the flag to indicate that the program counter has changed
+		sim->is_pc_changed = 1;
 	}
 }
 
@@ -103,6 +126,8 @@ void isa_bge(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	if (read_register(sim, rs) >= read_register(sim, rt)) {
 		// Branch taken, adjust the program counter (sim->pc)
 		sim->pc = read_register(sim, rd) & 0xfff;	// 12 bit mask for sim->pc
+		// Set the flag to indicate that the program counter has changed
+		sim->is_pc_changed = 1;
 	}
 }
 
@@ -112,6 +137,8 @@ void isa_jal(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	write_register(sim, rd, sim->pc + 1); // Save the next instruction address
 	// Jump to the target address
 	sim->pc = read_register(sim, rs) & 0xfff; // 12 bit mask for sim->pc
+	// Set the flag to indicate that the program counter has changed
+	sim->is_pc_changed = 1;
 }
 
 // 16. Implementation of the "lw" ISA instruction
@@ -127,12 +154,20 @@ void isa_sw(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	int32_t address = read_register(sim, rs) + read_register(sim, rt);
 	int32_t value = read_register(sim, rd);
 	write_memory(sim, address, value);
+	if (address > sim->max_memory_address && value != 0) {
+		// Update the maximum memory address used
+		sim->max_memory_address = address;
+	}
 }
 
 // 18. Implementation of the "reti" ISA instruction	(interupt return address)
 void isa_reti(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	int32_t return_address = read_io_reg(sim, IRQRETURN);
 	sim->pc = return_address;
+	// Set the flag to indicate that the program counter has changed
+	sim->is_pc_changed = 1;
+	// Clear the IRQ flag
+	sim->is_in_irq = 0;
 }
 
 // 19. Implementation of the "in" ISA instruction
@@ -146,10 +181,13 @@ void isa_in(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 void isa_out(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	int32_t io_reg_index = read_register(sim, rs) + read_register(sim, rt);
 	int32_t value = read_register(sim, rd);
-	write_io_reg(sim, io_reg_index, value);
+	if (io_reg_index == MONITORCMD && value == 1)
+		update_monitor(sim, read_io_reg(sim, MONITORADDR));
+	else
+		write_io_reg(sim, io_reg_index, value);
 }
 
-// 21. Implementation of the "halt" ISA instruction										# Need to implement halt functionality on the simulator	file
+// 21. Implementation of the "halt" ISA instruction
 void isa_halt(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	// Set the simulator's running flag to false to stop execution
 	sim->is_running = 0;

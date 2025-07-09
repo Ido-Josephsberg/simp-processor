@@ -6,9 +6,7 @@
 
 // Initialize the io register array to zero
 void init_io_reg_array(Simulator* sim) {
-    for (int i = 0; i < IO_REG_NUM; ++i) {
-        sim->io_reg_array[i] = 0;
-    }
+	memset(sim->io_reg_array, 0, sizeof(sim->io_reg_array));
 }
 
 void get_io_reg_name(char* dst, io_reg_name reg_index) {
