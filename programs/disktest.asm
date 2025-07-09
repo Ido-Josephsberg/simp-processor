@@ -2,7 +2,6 @@
 
 init:
     add $t0, $zero, $imm, 1         # $t0 = 1
-    out $zero, $zero, $t0, 0        # IORegister[0] = 1 (enable irq0)
     out $zero, $zero, $t0, 1        # IORegister[1] = 1 (enable irq1)
     add $t1, $zero, $imm, irq_handler # $t1 = address of irq_handler
     out $zero, $zero, $t1, 6        # IORegister[6] = $t1
