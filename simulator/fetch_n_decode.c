@@ -89,6 +89,27 @@ static void check_for_irq2(Simulator* sim, int* irq2_index_ptr) {
 	}
 }
 
+static void update_timer(Simulator* sim) {
+	// Check if the timer is enabled
+	if (read_io_reg(sim, TIMERENABLE)) {
+		// Decrement the timer value
+		int32_t timer_value = read_io_reg(sim, TIMERCURRENT);
+		if (timer_value < read_io_reg(sim, TIMERMAX)) {
+			timer_value++;
+			write_io_reg(sim, TIMERCURRENT, timer_value);
+		}
+		else {
+			write_io_reg(sim, IRQ1STATUS, 1);
+			write_io_reg(sim, TIMERCURRENT, 0);
+		}
+	}
+}
+
+static void check_disk_avilability(Simulator* sim) {
+	if (sim->cycles % 1024 == 0)
+		write_io_reg(sim, IRQ1STATUS, 1);
+}
+
 void fetch_n_decode_loop(Simulator* sim) {
 	bool irq0, irq1, irq2, irq;
 	int irq2_index = 0;
@@ -134,7 +155,11 @@ void fetch_n_decode_loop(Simulator* sim) {
 			sim->is_pc_changed = false;
 		else
 			sim->pc++;
+		// Update and check IRQs.
 		check_for_irq2(sim, &irq2_index);
+		update_timer(sim);
+		check_disk_avilability(sim);
+
 		sim->cycles++;
 	}
 }
