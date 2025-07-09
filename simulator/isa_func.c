@@ -173,7 +173,7 @@ void isa_reti(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 // 19. Implementation of the "in" ISA instruction
 void isa_in(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	int32_t io_reg_index = read_register(sim, rs) + read_register(sim, rt);
-	int32_t value = read_io_reg(sim, io_reg_index);
+	int32_t value = io_reg_index == MONITORCMD ? 0 : read_io_reg(sim, io_reg_index);
 	write_register(sim, rd, value);
 }
 
@@ -183,8 +183,7 @@ void isa_out(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	int32_t value = read_register(sim, rd);
 	if (io_reg_index == MONITORCMD && value == 1)
 		update_monitor(sim, read_io_reg(sim, MONITORADDR));
-	else
-		write_io_reg(sim, io_reg_index, value);
+	write_io_reg(sim, io_reg_index, value);
 }
 
 // 21. Implementation of the "halt" ISA instruction
