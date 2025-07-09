@@ -1,48 +1,50 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include "dynamic_str.h"
+#include "macros.h"
+#include "dynamic_mem.h"
 
 
-DynamicString* create_dynamic_str() {
+DynamicMem* create_dynamic_mem() {
 	/*
-	Create a new dynamic string with an initial size of 4096 bytes.
+	Create a new dynamic memory with an initial size of 4096 bytes.
 	*/
 
-	// Initial size of the string buffer.
+	// Initial size of the memory.
 	const size_t initial_size = 4096;
-	// Allocate memory for the DynamicString structure.
-	DynamicString* str = (DynamicString*)malloc(sizeof(DynamicString));
+	// Allocate memory for the DynamicMem structure.
+	DynamicMem* mem_ptr = (DynamicMem*)malloc(sizeof(DynamicMem));
 	// Check if memory allocation was successful, if not, notify and exit the program with MEMORY_ERROR.
-	if (str == NULL) {
+	if (mem_ptr == NULL) {
 		printf("Memory allocation failed\n");
 		exit(MEMORY_ERROR);
 	}
-	// Allocate memory for the string data with the initial size.
-	str->data = (char*)malloc(initial_size * sizeof(char));
-	// Check if memory allocation for the string data was successful, if not, free the structure, notify
+	// Allocate memory for the data with the initial size.
+	mem_ptr->data = calloc(initial_size,1);
+	// Check if memory allocation for the data was successful, if not, free the structure, notify
 	// and exit the program with MEMORY_ERROR.
-	if (str->data == NULL) {
-		free(str);
+	if (mem_ptr->data == NULL) {
+		free(mem_ptr);
 		printf("Memory allocation failed\n");
 		exit(MEMORY_ERROR);
 	}
 	// Set the allocated memory size to the initial size.
-	str->alloc_size = initial_size;
-	// Return the pointer to the newly created dynamic string structure.
-	return str;
+	mem_ptr->alloc_size = initial_size;
+	// Return the pointer to the newly created dynamic memory structure.
+	return mem_ptr;
 }
 
-void dynamic_str_reallocate(DynamicString* str) {
+void dynamic_mem_reallocate(DynamicMem* mem) {
 	/*
 	realocate the memory block to a new size that is the double of the original size and update the pointer.
 	exits the program with MEMORY_ERROR if the reallocation fails.
-	str: Pointer to the dynamic string that needs reallocation.
+	mem: Pointer to the dynamic memory that needs reallocation.
 	*/
 
-	// Increase the size of the allocated memory by doubling his current size. 
-	str->alloc_size *= 2;
+	// Increase the size of the allocated memory by doubling its current size. 
+	mem->alloc_size *= 2;
 	// Attempt to reallocate memory
-	void* new_ptr = realloc(str->data, str->alloc_size);
+	void* new_ptr = realloc(mem->data, mem->alloc_size);
 	// Check if the reallocation was successful
 	if (new_ptr == NULL) {
 		// In case of memory allocation failure, print an error message and exit the program.
@@ -50,10 +52,10 @@ void dynamic_str_reallocate(DynamicString* str) {
 		exit(MEMORY_ERROR);
 	}
 	// Update the original pointer to point to the newly allocated memory block.
-	str->data = new_ptr;
+	mem->data = new_ptr;
 }
-void ensure_str_capacity(DynamicString* str, int needed_size_buffer) {
 
+void ensure_str_capacity(DynamicMem* str, size_t needed_size_buffer) {
 	/*
 	Ensure that the string has enough allocated memory to append string with needed_size_buffer size including the null terminator.
 	str: Pointer to the string that needs capacity adjustment.
@@ -62,9 +64,9 @@ void ensure_str_capacity(DynamicString* str, int needed_size_buffer) {
 	*/
 
 	// Calculate the total size needed for the new string, which is the current string length plus the size of the buffer needed.
-	size_t size_of_new_str = strlen(str->data) + needed_size_buffer;
+	size_t size_of_new_str = strlen((char*)str->data) + needed_size_buffer;
 	// While the current allocated memory size is less than the size needed for the new string, reallocate memory and update the current allocated memory size (to double of the original size).
 	while (str->alloc_size < size_of_new_str) {
-		dynamic_str_reallocate(str);
+		dynamic_mem_reallocate(str);
 	}
 }
