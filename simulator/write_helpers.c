@@ -157,7 +157,7 @@ int write_disk_content_to_file(FILE* file, uint32_t disk[][DISK_ROWS]) {
 	return 0;
 }
 
-int write_monitor_content_to_file(FILE* file, uint8_t monitor[][PIXEL_PER_ROW_COL], int max_pixel_index[], int is_yuv) {
+int write_monitor_content_to_file(FILE* file, uint8_t monitor[][PIXEL_PER_ROW_COL], int max_pixel_index[]) {
 	/*
 	 @brief: This function writes the content of a monitor 2D array to a file in 8-digit zero-padded hexadecimal format.
 			 - it writes the full monitor content, whether it is zero or not.
@@ -170,12 +170,11 @@ int write_monitor_content_to_file(FILE* file, uint8_t monitor[][PIXEL_PER_ROW_CO
 	 // Check if the file pointer and disk pointer are not NULL
 	if (monitor == NULL || file == NULL) {
 		return -1; // Error: file pointer is NULL
-	}
-	int row_upper_bound = is_yuv ? PIXEL_PER_ROW_COL : max_pixel_index[0]; 
+	} 
 	int col_upper_bound = PIXEL_PER_ROW_COL;
 	// Write disk content to the file
-	for (int i = 0; i <= row_upper_bound; i++) {
-		if (i == max_pixel_index[0] && !is_yuv) {
+	for (int i = 0; i <= max_pixel_index[0]; i++) {
+		if (i == max_pixel_index[0]) {
 			col_upper_bound = max_pixel_index[1] + 1; // Last row may not be full
 		}
 		for (int j = 0; j < col_upper_bound; j++) { 
@@ -184,6 +183,28 @@ int write_monitor_content_to_file(FILE* file, uint8_t monitor[][PIXEL_PER_ROW_CO
 				return -1; // fclose will be called outside the function.
 			}
 		}
+	}
+	return 0;
+}
+
+int write_monitor_content_to_yuv_file(FILE* file, uint8_t monitor[][PIXEL_PER_ROW_COL]) {
+	/*
+	 @brief: This function writes the content of a monitor 2D array to a file as raw bytes (YUV format).
+	 @param: file - pointer to the file where the monitor content will be written.
+	 @param: monitor - a 2D array of unsigned 8-bit integers representing the monitor content.
+	 @return: int - returns 0 on success, or -1 if an error occurs.
+	 */
+
+	 // Check if the file pointer and disk pointer are not NULL
+	if (monitor == NULL || file == NULL) {
+		return -1; // Error: file pointer is NULL
+	}
+	// Write the entire monitor buffer as raw bytes (YUV)
+	size_t rows = PIXEL_PER_ROW_COL;
+	size_t cols = PIXEL_PER_ROW_COL;
+	size_t written = fwrite(monitor, sizeof(uint8_t), rows * cols, file);
+	if (written != rows * cols) {
+		return -1;
 	}
 	return 0;
 }
