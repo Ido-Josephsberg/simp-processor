@@ -202,7 +202,9 @@ void fetch_n_decode_loop(Simulator* sim) {
 	
 	// Keep running the loop until the simulator is not running
 	while (sim->is_running) {
-		// Check if last cycle was an instruction with big immediate value
+		printf("Cycle %d, PC: %d\n", sim->cycles, sim->pc);
+		//if (sim->cycles == sim->)
+		// TODO: REMOVE ME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		if (!sim->bigimm) {
 			// If the instruction is not a big immediate instruction, check for interrupts
 			irq0 = read_io_reg(sim, IRQ0ENABLE) & read_io_reg(sim, IRQ0STATUS);

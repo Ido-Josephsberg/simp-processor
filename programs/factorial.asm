@@ -1,4 +1,5 @@
 init:
+    add $sp, $zero, $imm, 4068          # Initialize stack pointer to top of memory
     add $sp, $sp, $imm, -3              # adjust stack for 3 items
     sw $a0, $sp, $imm, 0                # save initial argument on stack_0[0]
     sw $ra, $sp, $imm, 1                # save initial return address on stack_0[1]
@@ -12,9 +13,9 @@ factorial:
     beq $a0, $zero, $imm, if            # if n == 0, enter if block
 else:
     sub $a0, $a0, $imm, 1               # $a0 = n-1
-    jal $ra, $imm, zero, factorial      # recursive call: factorial(n-1)
+    jal $ra, $imm, $zero, factorial      # recursive call: factorial(n-1)
     lw $a0, $sp, $imm, 0                # restore argument n
-    mul $v0, $a0, $v0                   # $v0 = n * factorial(n-1)
+    mul $v0, $a0, $v0, 0                   # $v0 = n * factorial(n-1)
     beq $imm, $zero, $zero, done        # jump to done
 if:
     add $v0, $zero, $imm, 1             # return 1 (base case)
