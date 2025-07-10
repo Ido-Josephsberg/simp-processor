@@ -24,32 +24,45 @@ void update_leds(Simulator* sim) {
 	sim: Pointer to the Simulator instance containing the current state of the simulation.
 	*/
 
-	// Ensure that the leds_str has enough allocated memory to append new line.
-	ensure_str_capacity(sim->leds_str, LEDS_LINE_SIZE);
+	// Ensure that the leds_str has enough allocated memory to append new line. If the allocation fails, notify the user, free the simulator and exit with an error code.
+	if(ensure_str_capacity(sim->leds_str, LEDS_LINE_SIZE) == -1) {
+		printf("Error: Failed to allocate memory for LEDs trace string\n");
+		free_simulator(sim);
+		exit(MEMORY_ERROR);
+	}
 	// Update the trace string with the current cycle, pc, instruction, and register values.
 	add_curr_data_to_leds(sim);
 }
 
 int write_leds_file_wrapper(Simulator* sim, output_paths* paths) {
+	/*
+	Implement the logic to write the LEDs string content to the output file.
+	sim: Pointer to the Simulator object.
+	paths: Pointer to the output_paths object containing the path to the LEDs file.
+	*/
 
+	// Get the path to the LEDs file from the output_paths object
 	char* leds_path = paths->leds_path;
 
 	// Open the output file for writing
 	FILE* leds_file = checked_fopen(leds_path, "w");
+	// Check if the file was opened successfully. If not, free the simulator and exit with an error code.
 	if (leds_file == NULL) {
+		free_simulator(sim);
 		printf("Error opening file %s for writing\n", leds_path);
-		return -1; // Return error code
+		exit(FILE_ERROR);
 	}
-	//*TODO: Implement the logic to extract the leds string from the simulator.
+	// Get the LEDs string from the simulator object
 	char* leds_string = sim->leds_str->data;
 
-	//write the trace string content to the file
+	//write the trace string content to the file. If the write operation fails, free the simulator, close the file, and exit with an error code.
 	if (write_str_to_file(leds_file, leds_string) != 0) {
+		free_simulator(sim);			
 		printf("Error writing LEDs string content to file %s\n", leds_path);
 		fclose(leds_file);
-		return -1; // Return error code
+		exit(FILE_ERROR);
 	}
-
+	// Close the file after writing
 	fclose(leds_file);
 	return 0;
 }

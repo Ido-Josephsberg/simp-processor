@@ -32,6 +32,7 @@ typedef struct Simulator {
 	int num_irq2_cycles;						 // Number of cycles when IRQ2 was triggered.
 } Simulator;
 
-void simulator_init(Simulator* sim, input_paths in_paths, output_paths out_paths);
+Simulator* simulator_init(input_paths in_paths);
+void free_simulator(Simulator* sim);
 
 #endif // SIMULATOR_H

@@ -3,27 +3,27 @@
 #include "simulator.h"
 #include "io_register.h"
 
-
-// Initialize the io register array to zero
-void init_io_reg_array(Simulator* sim) {
-	memset(sim->io_reg_array, 0, sizeof(sim->io_reg_array));
-}
-
-void get_io_reg_name(char* dst, io_reg_name reg_index) {
+int get_io_reg_name(char* dst, io_reg_name reg_index) {
 	/*
-	Write the name of the io register to dst based on the index.
+	Write the name of the io register to dst based on the index. Return 0 on success, -1 on failure.
 	dst: Pointer to a string buffer where the name will be written. should be at least IO_REG_MAX_NAME_SIZE characters long.
 	reg_index: The index of the io register to copy his name.
 	*/
+
     // Array of io register names ordered by their indices - lowercase.
     const char* hw_reg_names[IO_REG_NUM] = {
         "irq0enable", "irq1enable", "irq2enable", "irq0status", "irq1status", "irq2status", "irqhandler", "irqreturn", 
         "clks", "leds", "display7seg", "timerenable", "timercurrent", "timermax", "diskcmd", "disksector",  
         "diskbuffer", "diskstatus", "reserved18", "reserved19", "monitoraddr", "monitordata", "monitorcmd"
     };
-    // Only copy name to dst if index is valid
-    if (reg_index >= 0 && reg_index < IO_REG_NUM)
+    // Copy the name to dst if index is valid
+    if (reg_index >= 0 && reg_index < IO_REG_NUM) {
         strncpy(dst, hw_reg_names[reg_index], IO_REG_MAX_NAME_SIZE);
+        return 0;
+    }
+	// If index is invalid, return -1
+	printf("Error: Invalid io register index %d\n", reg_index);
+    return -1;
 }
 
 int get_io_reg_length(io_reg_name reg_index) {

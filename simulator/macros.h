@@ -5,7 +5,7 @@
 #define INST_NUM_OF_DIGITS 8
 #define MACRO_TO_STR(x) STR(x) // Interpret the macro and convert it to a string literal
 #define STR(x) #x // Converts x to a string literal
-#define MEMORY_ERROR 1
+#define MEMORY_ERROR -1
 
 // Macros related to Memory
 #define MEMORY_SIZE 4096            // Size of memory in words
@@ -25,8 +25,8 @@
 #define MONITOR_DIMENSION 2 // Monitor dimensions - 2D array
 
 // Macros related to file handling
-#define FILE_ERROR 2
-#define INPUT_ERROR 3
+#define FILE_ERROR -2
+#define INPUT_ERROR -3
 #define MAX_UINT_32 4294967295 // Maximum value for a 32-bit unsigned integer
 
 // Macros related to ISA
@@ -53,3 +53,4 @@
 
 // Macros related to Fetch and Decode
 #define IMM_NUM_OF_BYTES 8 
+#define STACK_OVERFLOW_ERROR -4 // Error code for stack overflow

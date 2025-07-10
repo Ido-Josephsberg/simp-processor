@@ -143,7 +143,6 @@
     <ClInclude Include="simulator.h" />
     <ClInclude Include="trace_handler.h" />
     <ClInclude Include="files_handler.h" />
-    <ClInclude Include="sim_helpers.h" />
     <ClInclude Include="write_helpers.h" />
   </ItemGroup>
   <ItemGroup>
@@ -163,7 +162,6 @@
     <ClCompile Include="isa_func.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="simulator.c" />
-    <ClCompile Include="sim_helpers.c" />
     <ClCompile Include="write_helpers.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
