@@ -5,6 +5,11 @@
 
 // Update the monitor with the pixel value read from the MONITORDATA register
 static void update_monitor(Simulator* sim, int32_t offset) {
+	/*
+	Update the monitor with the pixel value read from the MONITORDATA register at the specified offset.
+	sim: The pointer to the simulator struct.
+	offset: The offset to determine the row and column in the monitor.
+	*/
 	int32_t row = offset / PIXEL_PER_ROW_COL;
 	int32_t col = offset % PIXEL_PER_ROW_COL;
 	int32_t pixel_value = read_io_reg(sim, MONITORDATA);
@@ -173,6 +178,7 @@ void isa_reti(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 // 19. Implementation of the "in" ISA instruction
 void isa_in(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	int32_t io_reg_index = read_register(sim, rs) + read_register(sim, rt);
+	// If the io_reg_index is MONITORCMD, we always read 0.
 	int32_t value = io_reg_index == MONITORCMD ? 0 : read_io_reg(sim, io_reg_index);
 	write_register(sim, rd, value);
 }
@@ -181,6 +187,7 @@ void isa_in(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 void isa_out(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 	int32_t io_reg_index = read_register(sim, rs) + read_register(sim, rt);
 	int32_t value = read_register(sim, rd);
+	// If the io_reg_index is MONITORCMD, we update the monitor with the value from MONITORADDR register
 	if (io_reg_index == MONITORCMD && value == 1)
 		update_monitor(sim, read_io_reg(sim, MONITORADDR));
 	write_io_reg(sim, io_reg_index, value);

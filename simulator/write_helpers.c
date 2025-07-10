@@ -8,14 +8,7 @@
 #include "write_helpers.h"
 #include "simulator.h"
 
-/////////////////////////////////////////// [TODO] /////////////////////////////////////////
-// Todos:
-//		
-//		* Consider using a more robust error handling mechanism instead of just printing errors.
-//      * implement write_diskout_content_to_file()
-//		* Check if in write_num_to_file() we need to add a newline after the number.
-//
-/////////////////////////////////////////// [TODOS] /////////////////////////////////////////
+
 
 FILE* checked_fopen(const char* path, const char* mode) {
 	/*

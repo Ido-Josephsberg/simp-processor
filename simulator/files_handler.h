@@ -29,9 +29,9 @@ typedef struct input_paths {
 //////////////////////////// Fuctions decleration ////////////////////////////////
 void init_input_paths(input_paths* paths, char* argv[]);
 void init_output_paths(output_paths* paths, char* argv[]);
-uint32_t str_hex_to_uint32(const char* hex_str);
-void read_memin_file(input_paths* paths, uint32_t mem[], int* max_address);
-void read_diskin_file(input_paths* paths, uint32_t disk[][DISK_ROWS]);
-void read_irq2in_file(input_paths* paths, DynamicMem* irq2in, int* num_of_cycles);
+uint32_t str_hex_to_uint32(const char* hex_str, int* error);
+int read_memin_file(input_paths* paths, uint32_t mem[], int* max_address);
+int read_diskin_file(input_paths* paths, uint32_t disk[][DISK_ROWS]);
+int read_irq2in_file(input_paths* paths, DynamicMem* irq2in, int* num_of_cycles);
 
 #endif // FILES_H

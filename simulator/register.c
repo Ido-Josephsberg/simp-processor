@@ -6,13 +6,8 @@
 #include "register.h"
 #include "write_helpers.h"
 
-// Initialize the register array to zero
-void init_reg_array(Simulator* sim) {
-	memset(sim->reg_array, 0, sizeof(sim->reg_array));
-}
-
 // Read from any register
-int32_t read_register(Simulator* sim, reg_name reg) {
+uint32_t read_register(Simulator* sim, reg_name reg) {
     if (reg < 0 || reg >= REG_NUM) {
         return 0;
     }
@@ -20,7 +15,7 @@ int32_t read_register(Simulator* sim, reg_name reg) {
 }
 
 // Write only to registers 2 to 15
-void write_register(Simulator* sim, reg_name reg, int32_t value) {
+void write_register(Simulator* sim, reg_name reg, uint32_t value) {
     if (reg <= IMM || reg >= REG_NUM) {
 		return; // Ignore writes to invalid registers
     }
@@ -28,29 +23,31 @@ void write_register(Simulator* sim, reg_name reg, int32_t value) {
 }
 
 // Write to IMM register 
-void write_register_imm(Simulator* sim, int32_t value) {
+void write_register_imm(Simulator* sim, uint32_t value) {
     sim->reg_array[IMM] = value;
 }
 
-int write_regout_file_wrapper(Simulator* sim, output_paths* path) {
+// Write the regout file with the current registers content
+void write_regout_file_wrapper(Simulator* sim, output_paths* path) {
 	char* regout_path = path->regout_path;
 
 	// Open the output file for writing
     FILE* regout_file = checked_fopen(regout_path, "w");
     if (regout_file == NULL) {
+		free_simulator(sim);
         printf("Error opening file %s for writing\n", regout_path);
-        return -1; // Return error code
+        exit(FILE_ERROR);
 	}
 
-	//write the registers content to the file
+	// Write the registers content to the file. If it fails, notify the user, close the file, free the simulator, and exit with an error code.
     if (write_registers_content_to_file(regout_file, sim->reg_array) != 0) {
         printf("Error writing registers content to file %s\n", regout_path);
         fclose(regout_file);
-        return -1; // Return error code
+        free_simulator(sim);
+		exit(FILE_ERROR);
 	}
 
     // Close the file
     fclose(regout_file);
-	return 0; // Return success code
 }
  

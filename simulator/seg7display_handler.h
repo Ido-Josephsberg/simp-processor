@@ -3,4 +3,4 @@
 
 
 void update_7seg(Simulator* sim);
-int write_display7seg_file_wrapper(Simulator* sim, output_paths* paths);
+void write_display7seg_file_wrapper(Simulator* sim, output_paths* paths);

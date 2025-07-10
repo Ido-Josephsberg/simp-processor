@@ -11,6 +11,7 @@ typedef struct {
 } DynamicMem;
 
 DynamicMem* create_dynamic_mem();
-void dynamic_mem_reallocate(DynamicMem* mem);
-void ensure_str_capacity(DynamicMem* str, size_t needed_size_buffer);
+int dynamic_mem_reallocate(DynamicMem* mem);
+int ensure_str_capacity(DynamicMem* str, size_t needed_size_buffer);
+void free_dynamic_mem(DynamicMem* mem);
 
