@@ -7,18 +7,23 @@
 #include "isa_func.h"
 #include "simulator.h"
 #include "files_handler.h"
+#define True 1
+#define False 0
+#include "io_register.h"
+#include "monitor.h"
+#include "fetch_n_decode.h"
+#include "trace_handler.h"
+#include "hwregtrace_handler.h"
+#include "leds_handler.h"
+#include "seg7display_handler.h"
+#include "cycles.h"
+#include "disk.h"
+#include "monitor.h"
 
 
-/////////////////////////////////////////// [TODO] /////////////////////////////////////////
-// Todos:
-//		
-//		* Continue implementing the main function according to the block diagram.
-//
-//
-/////////////////////////////////////////// [TODOS] /////////////////////////////////////////
+
 
 int main(int argc, char** argv) {
-	// TODO: check if assuming input correctness is allowed.
 	// Check if the correct number of arguments is provided
 	if (argc < 14) {
 		printf("Usage: %s <memin_path> <diskin_path> <irq2in_path> <memout_path> <regout_path> <trace_path> <hwregtrace_path> <cycles_path> <leds_path> <display7seg_path> <diskout_path> <monitor_txt_path> <monitor_yuv_path>\n", argv[0]);
@@ -27,16 +32,31 @@ int main(int argc, char** argv) {
 	// Initialize input and output paths
 	input_paths in_paths;
 	output_paths out_paths;
-
 	init_input_paths(&in_paths, argv);
 	init_output_paths(&out_paths, argv);
 
-	//Initialize the simulator fileds
-	Simulator sim;
+	// Initialize the simulator object.
+	Simulator* sim = simulator_init(in_paths, out_paths);
+	if (sim == NULL) {
+		fprintf(stderr, "Failed to allocate memory for the simulator.\n");
+		return MEMORY_ERROR;
+	}
+
+	// Execute the instructions stored in the memin file.
+	fetch_n_decode_loop(sim);
+
+	// Write the output files after the simulation is done.
+	write_trace_file_wrapper(sim, &out_paths);
+	write_hwregtrace_file_wrapper(sim, &out_paths);
+	write_cycles_file_wrapper(sim, &out_paths);
+	write_leds_file_wrapper(sim, &out_paths);
+	write_display7seg_file_wrapper(sim, &out_paths);
+	write_diskout_file_wrapper(sim, &out_paths);
+	write_monitor_files_wrapper(sim, &out_paths, sim->max_monitor_pixel);
+	write_memout_file_wrapper(sim, &out_paths);
+	write_regout_file_wrapper(sim, &out_paths);
 	
-	// Allocate memory for the simulator
-	
-	// Comtinue with the main func addording to the block diagram. 
+	free_simulator(sim);
 
 	return 0;
 }

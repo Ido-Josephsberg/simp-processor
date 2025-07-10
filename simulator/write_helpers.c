@@ -4,20 +4,11 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "sim_helpers.h" // DELETE AFTER IMPLEMENTING FILES PER FUNCTION.
+#include "macros.h"
 #include "write_helpers.h"
-#include "register.h"
-#include "memory.h"
 #include "simulator.h"
 
-/////////////////////////////////////////// [TODO] /////////////////////////////////////////
-// Todos:
-//		
-//		* Consider using a more robust error handling mechanism instead of just printing errors.
-//      * implement write_diskout_content_to_file()
-//		* Check if in write_num_to_file() we need to add a newline after the number.
-//
-/////////////////////////////////////////// [TODOS] /////////////////////////////////////////
+
 
 FILE* checked_fopen(const char* path, const char* mode) {
 	/*
@@ -109,7 +100,7 @@ int write_registers_content_to_file(FILE* file, int32_t* reg_array) {
 	return 0;
 }
 
-int write_memory_content_to_file(FILE* file, uint32_t* memory) {
+int write_memory_content_to_file(FILE* file, uint32_t* memory, int maximum_address) {
 	/*
 	 @brief: This function writes the content of a memory array to a file in 8-digit zero-padded hexadecimal format.
 			 - relevant to functions: write_memout (1 in total)
@@ -123,17 +114,8 @@ int write_memory_content_to_file(FILE* file, uint32_t* memory) {
 	if (memory == NULL || file == NULL)
 		return -1; // Error: file pointer is NULL
 
-	// Find last non-zero line in memory /// I DONT THINK ITS NEEDED!!!
-	int32_t last_non_zero_line = 0;
-	
-	for (int32_t i = 0; i < MEMORY_SIZE; i++) { 
-		if (memory[i] != 0) {
-			last_non_zero_line = i;
-		}
-	}
-
 	// Write memory content to the file
-	for (int32_t i = 0; i <= last_non_zero_line; i++) {
+	for (int32_t i = 0; i <= maximum_address; i++) {
 		if (fprintf(file, "%08X\n", memory[i]) < 0) {
 			return -1; // fclose will be called outside the function.
 		}
@@ -168,7 +150,7 @@ int write_disk_content_to_file(FILE* file, uint32_t disk[][DISK_ROWS]) {
 	return 0;
 }
 
-int write_monitor_content_to_file(FILE* file, uint8_t** monitor) {
+int write_monitor_content_to_file(FILE* file, uint8_t monitor[][PIXEL_PER_ROW_COL], int max_pixel_index[]) {
 	/*
 	 @brief: This function writes the content of a monitor 2D array to a file in 8-digit zero-padded hexadecimal format.
 			 - it writes the full monitor content, whether it is zero or not.
@@ -181,16 +163,41 @@ int write_monitor_content_to_file(FILE* file, uint8_t** monitor) {
 	 // Check if the file pointer and disk pointer are not NULL
 	if (monitor == NULL || file == NULL) {
 		return -1; // Error: file pointer is NULL
-	}
-
+	} 
+	int col_upper_bound = PIXEL_PER_ROW_COL;
 	// Write disk content to the file
-	for (int i = 0; i < PIXEL_PER_ROW_COL; i++) {
-		for (int j = 0; j < PIXEL_PER_ROW_COL; j++) {
+	for (int i = 0; i <= max_pixel_index[0]; i++) {
+		if (i == max_pixel_index[0]) {
+			col_upper_bound = max_pixel_index[1] + 1; // Last row may not be full
+		}
+		for (int j = 0; j < col_upper_bound; j++) { 
 			// Write the number in 8-digit zero-padded hexadecimal format
 			if (fprintf(file, "%02X\n", monitor[i][j]) < 0) {
 				return -1; // fclose will be called outside the function.
 			}
 		}
+	}
+	return 0;
+}
+
+int write_monitor_content_to_yuv_file(FILE* file, uint8_t monitor[][PIXEL_PER_ROW_COL]) {
+	/*
+	 @brief: This function writes the content of a monitor 2D array to a file as raw bytes (YUV format).
+	 @param: file - pointer to the file where the monitor content will be written.
+	 @param: monitor - a 2D array of unsigned 8-bit integers representing the monitor content.
+	 @return: int - returns 0 on success, or -1 if an error occurs.
+	 */
+
+	 // Check if the file pointer and disk pointer are not NULL
+	if (monitor == NULL || file == NULL) {
+		return -1; // Error: file pointer is NULL
+	}
+	// Write the entire monitor buffer as raw bytes (YUV)
+	size_t rows = PIXEL_PER_ROW_COL;
+	size_t cols = PIXEL_PER_ROW_COL;
+	size_t written = fwrite(monitor, sizeof(uint8_t), rows * cols, file);
+	if (written != rows * cols) {
+		return -1;
 	}
 	return 0;
 }

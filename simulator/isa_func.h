@@ -1,5 +1,5 @@
 #pragma once
-#define ISA_FUNC_NUM_OF_FUNCS 22
+#include "simulator.h"
 
 typedef enum {
 	ADD, // 0
@@ -46,5 +46,5 @@ void isa_lw(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
 void isa_sw(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
 void isa_reti(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
 void isa_in(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
-void isa_out(Simulator* sim, reg_name rs, reg_name rt, reg_name rd);
+void isa_out(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
 void isa_halt(Simulator* sim, reg_name rd, reg_name rs, reg_name rt);
