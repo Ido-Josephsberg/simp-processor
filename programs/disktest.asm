@@ -1,69 +1,66 @@
-﻿init:
-    add $t0, $zero, $imm, 1         # $t0 = 1
-    out $zero, $zero, $t0, 1        # IORegister[1] = 1 (enable irq1)
-    add $t1, $zero, $imm, irq_handler # $t1 = address of irq_handler
-    out $t1, $zero, $imm, 6         # IORegister[6] = $t1 (set irqhandler register to IRQ_HANDLER)
+﻿READ_SECTOR0:
+	add $a0, $zero, $imm, 1				# $a0 = 1 (set disk command to read)
+	jal $ra, $imm, $zero, WAIT_FOR_DISK # jump to wait for disk status
+	add $t0, $zero, $zero, 0			# $t0 = 0 (save disk sector)
+	out $t0, $zero, $imm, 15			# IORegister[15] = $t0 (disksector = 0)
+	add $t1, $zero, $imm, 3456			# $t0 = 3456 (save disk buffer address for sector0)
+	out $t1, $zero, $imm, 16			# IORegister[16] = $t1 (diskbuffer = sector0)
+	out $a0, $zero, $imm, 14			# IORegister[14] = $a0 (diskcmd = 1; read disk command)
 
-    # sector4[i] = sector0[i];
-    add $a3, $zero, $imm, 512           # $a3 = 512 (&sector4)
-    out $a3, $zero, $imm, 16            # IORegister[16] = $a3 (diskbuffer = sector4)
-    add $a1, $zero, $zero, 0            # $a1 = 0 (sector0)
-    out $a1, $zero, $imm, 15            # IORegister[15] = $a1 (disksector = 0) ## need to check if i can write to IOreg 
-    add $t0, $zero, $imm, 1             # $t0 = 1 (set disk commant to 1 = read)
-    out $zero, $zero, $t0, 14           # IORegister[14] = $t0 (diskcmd = 1)
-######### i dont need the value in $t0 from here ####
-CHECK_DISK:
-    in  $t2, $zero, $imm, 17            # $t2 = IORegister[17] (get diskstatus)
-    add $t0, $zero, $imm, 1             # $t0 = 1
-    beq $zero, $t2, $t0, IRQ_HANDLER    # if $t2 == 1 (if diskstatus 1 - go to IRQ_HANDLER)
----------------> continue from here
+READ_SECTOR1:
+	jal $ra, $imm, $zero, WAIT_FOR_DISK # jump to wait for disk status
+	add $t0, $zero, $imm, 1				# $t0 = 1 (save disk sector)
+	out $t0, $zero, $imm, 15			# IORegister[15] = $t0 (disksector = 1)
+	add $t1, $t1, $imm, 128 			# $t1 += 128 (save disk buffer address for sector1)
+	out $t1, $zero, $imm, 16			# IORegister[16] = $t1 (diskbuffer = sector1)
+	out $a0, $zero, $imm, 14			# IORegister[14] = $a0 (diskcmd = 1; read disk command)
 
-IRQ_HANDLER:
-    add $t0, $zero, $imm, 1         # $t0 = 1
-    reti $zero, $zero, $zero, 0     # Return from interrupt
+READ_SECTOR2:
+	jal $ra, $imm, $zero, WAIT_FOR_DISK # jump to wait for disk status
+	add $t0, $zero, $imm, 2				# $t0 = 2 (save disk sector)
+	out $t0, $zero, $imm, 15			# IORegister[15] = $t0 (disksector = 2)
+	add $t1, $t1, $imm, 128 			# $t1 += 128 (save disk buffer address for sector2)
+	out $t1, $zero, $imm, 16			# IORegister[16] = $t1 (diskbuffer = sector2)
+	out $a0, $zero, $imm, 14			# IORegister[14] = $a0 (diskcmd = 1; read disk command)
 
---- old code ---
-wait_sector0:
-    in  $t2, $zero, $imm, 17       # $t2 = IORegister[17] (get diskstatus)
-    beq $zero, $t2, $zero, wait_sector0 # if $t2 == 0, loo
+READ_SECTOR3:
+	jal $ra, $imm, $zero, WAIT_FOR_DISK # jump to wait for disk status
+	add $t0, $zero, $imm, 3				# $t0 = 3 (save disk sector)
+	out $t0, $zero, $imm, 15			# IORegister[15] = $t0 (disksector = 3)
+	add $t1, $t1, $imm, 128 			# $t1 += 128 (save disk buffer address for sector3)
+	out $t1, $zero, $imm, 16			# IORegister[16] = $t1 (diskbuffer = sector3)
+	out $a0, $zero, $imm, 14			# IORegister[14] = $a0 (diskcmd = 1; read disk command)
 
-    add $a1, $zero, $imm, 1         # $a1 = 1 (start with sector1)
-    add $a2, $zero, $imm, 640       # $a2 = 640 (&buffer)
-sector_sum_loop:
-    out $a2, $zero, $imm, 16       # IORegister[16] = $a2 (diskbuffer = buffer)
-    out $a1, $zero, $imm, 15       # IORegister[15] = $a1 (disksector = sectorX)
-    add $t0, $zero, $imm, 1         # $t0 = 1 (read)
-    out $t0, $zero, $imm, 14       # IORegister[14] = $t0 (diskcmd = 1)
+# add each word in sector0-3 to sector4
+	add $t0, $zero, $imm, 0				# $t0 = 0 (init index i for loop)
+	add $a1, $zero, $imm, 3				# $a1 = 3 (number of lines to sum)
+FOR_LOOP_SUM:
+	lw $t1, $imm, $t0, 3456				# $t1 = sector0[i] (load word from sector0)
+	lw $t2, $imm, $t0, 3584				# $t2 = sector1[i] (load word from sector1)
+	add $t1, $t1, $t2, 0				# $t1 = sector0[i] + sector1[i]
+	lw $t2, $imm, $t0, 3712				# $t2 = sector2[i] (load word from sector2)
+	add $t1, $t1, $t2, 0				# $t1 = sector0[i] + sector1[i] + sector2[i]
+	lw $t2, $imm, $t0, 3840				# $t2 = sector3[i] (load word from sector3)
+	add $t1, $t1, $t2, 0				# $t1 = sector0[i] + sector1[i] + sector2[i] + sector3[i]
+	sw $t1, $imm, $t0, 3968				# store result in sector4[i]
+	bne $imm, $t0, $a1, FOR_LOOP_SUM	# if i < 3, continue loop
 
-wait_sectorX:
-    in  $t2, $zero, $imm, 17       # $t2 = IORegister[17] (fet diskstatus)
-    beq $zero, $t2, $zero, wait_sectorX # if $t2 == 0, loop   ## check i need to whait until status is 0 (if its 1 i need to wait) )
+# Write sector4 to disk
+	jal $ra, $imm, $zero, WAIT_FOR_DISK # jump to wait for disk status
+	add $a0, $zero, $imm, 2				# $a0 = 2 (set disk command to write)
+	add $t0, $zero, $imm, 4				# $t0 = 4 (save disk sector)
+	out $t0, $zero, $imm, 15			# IORegister[15] = $t0 (disksector = 4)
+	add $t1, $zero, $imm, 3968 			# $t1 = 3968 (save disk buffer address for sector4)
+	out $t1, $zero, $imm, 16			# IORegister[16] = $t1 (diskbuffer = sector4)
+	out $a0, $zero, $imm, 14			# IORegister[14] = $a0 (diskcmd = 2; write disk command)
 
-    add $a0, $zero, $zero, 0        # $a0 = i = 0
-sum_words_loop:
-    lw  $t0, $a2, $a0, 0            # $t0 = buffer[i]
-    lw  $t1, $a3, $a0, 0            # $t1 = sector4[i]
-    add $t2, $t0, $t1, 0            # $t2 = buffer[i] + sector4[i]
-    sw  $a3, $a0, $t2, 0            # sector4[i] = $t2
-    add $a0, $a0, $imm, 1           # i++
-    blt $a0, $zero, $imm, 128, sum_words_loop # if i < 128, loop
 
-    add $a1, $a1, $imm, 1           # sector++
-    blt $a1, $zero, $imm, 4, sector_sum_loop # if sector < 4, loop
 
-    out $a3, $zero, $imm, 16       # IORegister[16] = $a3 (diskbuffer = sector4)
-    add $a1, $zero, $imm, 4         # $a1 = 4 (sector4)
-    out $a1, $zero, $imm, 15       # IORegister[15] = $a1 (disksector = 4)
-    add $t0, $zero, $imm, 2         # $t0 = 2 (write)
-    out $t0, $zero, $imm, 14       # IORegister[14] = $t0 (diskcmd = 2)
 
-wait_write:
-    in  $t2, $zero, $zero, 17       # $t2 = IORegister[17] (diskstatus)
-    beq $zero, $t2, $zero, wait_write # if $t2 == 0, loop
 
-    halt $zero, $zero, $zero, 0     # End of program
 
-IRQ_HANDLER:
-    add $t0, $zero, $imm, 1         # $t0 = 1
-    reti $zero, $zero, $zero, 0     # Return from interrupt
-    החלק שכתוב את הדיסק יהיה בתווית של פסיקה
+WAIT_FOR_DISK:
+	in $t0, $zero, $imm, 17				# read disk status
+	bne $imm, $zero, $t0, WAIT_FOR_DISK # wait until disk status is 0
+	beq $ra, $zero, $zero, 0			# return from WAIT_FOR_DISK
+	
