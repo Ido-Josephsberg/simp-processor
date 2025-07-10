@@ -1,8 +1,8 @@
 // TODO
 
-// V - push
+// push
 
-// V - open solution
+// open solution
 
 // set Line line_array[assembly_line_count] = {0};		// array of lines structs corresponding to assembly lines
 // ^ first need to extract assembly_line_count from input .asm file

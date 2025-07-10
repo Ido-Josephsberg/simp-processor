@@ -127,7 +127,6 @@
     <ClCompile Include="file_handler.c" />
     <ClCompile Include="line_handler.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="various.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assembler.h" />

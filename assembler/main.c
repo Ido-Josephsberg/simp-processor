@@ -6,23 +6,24 @@
 #include "assembler.h"
 #include "file_handler.h"
 
-// 1. can i assume the main imput (argc and argv) is valid?
+// The assembler assumes that the given input is valid according to the specifications.
 
 int main(int argc, char* argv[]) {
-	if (argc < 3) { //NOT SURE IF NEEDED OR CAN ASSUME THE INPUT IS VALUD
+	if (argc < 3) { // Just in case - even though we assume valid input
 		printf("Error Missing argument (main): %s <input_file> <output_file>\n", argv[0]);
 		return -1;
 	}
+	// Open the assembly program file for reading
 	FILE* asm_program = checked_fopen(argv[1], "r");
 	if (asm_program == NULL) {
 		printf("Error opening file (main): %s\n", argv[1]);
 		return -1;
 	}
-	// Initialize line array and label dictionary
+	// Initialize line array and label dictionary array
 	Line line_array[MAX_MEM_LINES]; // Array to hold parsed lines
-	Label label_dict[MAX_MEM_LINES]; // Array to hold label addresses
+	Label label_dict[MAX_MEM_LINES]; // Array to hold label names & addresses
 
-	// Perform the first pass to parse the assembly file and fill the line array and label dictionary
+	// Perform the first pass to parse the assembly file and fill the line array and label dictionary array
 	int asm_line_count = 0;
 	int label_count = 0;
 	if (first_pass(asm_program, line_array, label_dict, &asm_line_count, &label_count) < 0) {
@@ -30,7 +31,7 @@ int main(int argc, char* argv[]) {
 		fclose(asm_program);
 		return -1;
 	}
-
+	// Check if the first pass was successful
 	if (asm_line_count < 0 || label_count < 0) {
 		printf("Error in first pass: %s\n", argv[1]);
 		fclose(asm_program);
@@ -75,5 +76,5 @@ int main(int argc, char* argv[]) {
 	fclose(output_file);
 	printf("Assembly completed successfully. Output written to: %s\n", argv[2]);
 
-	return 0; // TODO: implement the main logic of the program
+	return 0;
 }
