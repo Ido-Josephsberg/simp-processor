@@ -165,8 +165,6 @@ static void check_disk_availability(Simulator* sim, int* irq1_cycles) {
 			// If the disk is available and there is a command, set the disk status to busy, increment the cycles counter, and perform the read or write operation:
 			// Set the disk status to busy
 			write_io_reg(sim, DISKSTATUS, 1); 
-			// Increment the cycles counter
-			(*irq1_cycles)++; 
 			// Get the disk sector and memory address from the I/O registers
 			int disk_sektor = read_io_reg(sim, DISKSECTOR);
 			int mem_address = read_io_reg(sim, DISKBUFFER);
@@ -183,10 +181,8 @@ static void check_disk_availability(Simulator* sim, int* irq1_cycles) {
 		}
 		// If the disk is not available (disk_stat != 0), increment the cycles counter for IRQ1 (disk) to keep track of the time until the disk becomes available.
 		else if (disk_stat) {
-
 			(*irq1_cycles)++;
 		}
-
 	}
 }
 
