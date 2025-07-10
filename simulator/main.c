@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
 	init_output_paths(&out_paths, argv);
 
 	// Initialize the simulator object.
-	Simulator* sim = simulator_init(in_paths, out_paths);
+	Simulator* sim = simulator_init(in_paths);
 	if (sim == NULL) {
 		fprintf(stderr, "Failed to allocate memory for the simulator.\n");
 		return MEMORY_ERROR;
