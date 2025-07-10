@@ -1,4 +1,5 @@
-init: 
+init:
+    add $sp, $zero, $imm, 4068      # Initialize stack pointer to top of memory
     add $sp, $sp, $imm, -3	    	# adjust stack for 3 items
     sw $s0, $sp, $imm, 0            # save $s0 on stack[0]
     sw $s1, $sp, $imm, 1            # save $s1 on stack[1] 
@@ -6,16 +7,16 @@ init:
     add $s0, $zero, $imm, 0x100     # $s0 = base address of the array
     add $s1, $zero, $zero, 0        # $s1 = i = 0
 for_i:
-    add $t0, zero, $imm, 16         # $t0 = 16 (break limit for i)
-    beq $s1, $t0, $imm, done        # if i==16, break loop (finish)
+    add $t0, $zero, $imm, 16        # $t0 = 16 (break limit for i)
+    beq $imm, $s1, $t0, done        # if i==16, break loop (finish)
     add $s2, $zero, $zero, 0        # $s2 = j = 0
 for_j:
-    sub $t0, $imm, $t0, 15          # $t0 = 15-i (break limit for j)
-    beq $s2, $t0, $imm, inc_i       # if j == 15-i, break loop (next i)
+    sub $t0, $imm, $s0, 15          # $t0 = 15-i (break limit for j)
+    beq $imm, $s2, $t0, inc_i       # if j == 15-i, break loop (next i)
     lw $t0, $s0, $s2, 0             # $t0 = arr[j]
     add $t1, $s2, $imm, 1           # $t1 = j+1
     lw $t1, $s0, $t1, 0             # $t1 = arr[j+1]
-    ble $imm, $t0, $t1, inc_j       # if arr[i] <= arr[j+1], dont swap
+    ble $imm, $t0, $t1, inc_j       # if arr[j] <= arr[j+1], dont swap
 swap:
     add $t2, $t0, $zero, 0          # $t2 = temp copy of arr[j]
     add $t0, $s0, $s2, 0            # $t0 = address arr[j]
