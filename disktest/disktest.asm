@@ -33,7 +33,7 @@ READ_SECTOR3:
 
 # add each word in sector0-3 to sector4
 	add $t0, $zero, $imm, 0				# $t0 = 0 (init index i for loop)
-	add $a1, $zero, $imm, 3				# $a1 = 3 (number of lines to sum)
+	add $a1, $zero, $imm, 128			# $a1 = 127 (number of lines to sum)
 FOR_LOOP_SUM:
 	lw $t1, $imm, $t0, 3456				# $t1 = sector0[i] (load word from sector0)
 	lw $t2, $imm, $t0, 3584				# $t2 = sector1[i] (load word from sector1)
@@ -44,7 +44,7 @@ FOR_LOOP_SUM:
 	add $t1, $t1, $t2, 0				# $t1 = sector0[i] + sector1[i] + sector2[i] + sector3[i]
 	sw $t1, $imm, $t0, 3968				# store result in sector4[i]
 	add $t0, $t0, $imm, 1				# increment index i
-	bne $imm, $t0, $a1, FOR_LOOP_SUM	# if i < 3, continue loop
+	bne $imm, $t0, $a1, FOR_LOOP_SUM	# if i < 128, continue loop
 
 # Write sector4 to disk
 	jal $ra, $imm, $zero, WAIT_FOR_DISK # jump to wait for disk status
@@ -54,6 +54,7 @@ FOR_LOOP_SUM:
 	add $t1, $zero, $imm, 3968 			# $t1 = 3968 (save disk buffer address for sector4)
 	out $t1, $zero, $imm, 16			# IORegister[16] = $t1 (diskbuffer = sector4)
 	out $a0, $zero, $imm, 14			# IORegister[14] = $a0 (diskcmd = 2; write disk command)
+	halt $zero, $zero, $zero, 0			# halt the program
 
 
 
