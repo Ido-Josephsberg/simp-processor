@@ -54,6 +54,7 @@ FOR_LOOP_SUM:
 	add $t1, $zero, $imm, 3968 			# $t1 = 3968 (save disk buffer address for sector4)
 	out $t1, $zero, $imm, 16			# IORegister[16] = $t1 (diskbuffer = sector4)
 	out $a0, $zero, $imm, 14			# IORegister[14] = $a0 (diskcmd = 2; write disk command)
+	halt $zero, $zero, $zero, 0			# halt the program
 
 
 
