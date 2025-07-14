@@ -1,12 +1,17 @@
+.word 0x0000100 0x0000000
+.word 0x0000101 0x0001400
+.word 0x0000102 0x0001420
+.word 0x0000103 0x0000020
 init:
+    add $sp, $zero, $imm, 4068          # Initialize stack pointer
     add $sp, $sp, $imm, -4              # adjust stack for 4 items
     sw $a0, $sp, $imm, 0                # save initial a0 on stack_0[0]
     sw $a1, $sp, $imm, 1                # save initial a1 on stack_0[1]
     sw $a2, $sp, $imm, 2                # save initial a2 on stack_0[2]
     sw $a3, $sp, $imm, 3                # save initial a3 on stack_0[3]
     lw $a0, $zero, $imm, 0x100          # $a0 = &A
-    and $a1, $a0, $imm, 0xFF00          # $a1 = &A[15:8] = Y*[A]
-    and $a0, $a0, $imm, 0xFF            # $a0 = &A[7:0] = X[A]
+    and $a1, $a0, $imm, 0xFF00          # $a1 = &A[15:8] = Y*[A] - top row
+    and $a0, $a0, $imm, 0xFF            # $a0 = &A[7:0] = X[A]   - left col
     sub $a1, $imm, $a1, 255             # $a1 = 255-Y*[A] = Y[A]  
     lw $a2, $zero, $imm, 0x102          # $a2 = &C
     and $a3, $a2, $imm, 0xFF00          # $a3 = &C[15:8] = Y*[C]
@@ -29,6 +34,7 @@ test_pixel:
     out $t2, $zero, $imm, 21           # set pixel color white to monitordata
     add $t2, $zero, $imm, 1            # $t2 = 1 (write value)
     out $t2, $zero, $imm, 22           # write command to monitorcmd
+    out $t2, $zero, $imm, 22           # write command to monitorcmd -- ## double line
     beq $imm, $zero, $zero, next_pixel
 set_black:
     sub $t2, $imm, $t1, 255            # $t2 = 255-P[A] = Y*[P]  
