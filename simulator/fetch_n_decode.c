@@ -209,7 +209,7 @@ void fetch_n_decode_loop(Simulator* sim) {
 			irq1 = read_io_reg(sim, IRQ1ENABLE) & read_io_reg(sim, IRQ1STATUS);
 			irq2 = read_io_reg(sim, IRQ2ENABLE) & read_io_reg(sim, IRQ2STATUS);
 			irq = irq0 || irq1 || irq2;
-			// check if there was an interruptand if the simulator is already in an IRQ handler.
+			// check if there was an interrupt and if the simulator is already in an IRQ handler.
 			if (irq && (!sim->is_in_irq)) {
 				// If there is an interrupt and the simulator is not already in an IRQ handler, indicate that the simulator is in an IRQ handler.
 				sim->is_in_irq = true;
