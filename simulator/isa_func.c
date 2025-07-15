@@ -14,7 +14,8 @@ static void update_monitor(Simulator* sim, int32_t offset) {
 	int32_t col = offset % PIXEL_PER_ROW_COL;
 	int32_t pixel_value = read_io_reg(sim, MONITORDATA);
 	sim->monitor[row][col] = pixel_value;
-	if (row >= sim->max_monitor_pixel[0] && col > sim->max_monitor_pixel[1] && pixel_value){
+	if (col >= sim->max_monitor_pixel[1] && pixel_value){
+		if (col > sim->max_monitor_pixel[1] || row > sim->max_monitor_pixel[0])
 		// Update the maximum pixel position used in the monitor
 		sim->max_monitor_pixel[0] = row;
 		sim->max_monitor_pixel[1] = col;
