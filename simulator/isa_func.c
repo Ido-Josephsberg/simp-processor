@@ -66,7 +66,7 @@ void isa_sll(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 
 // 7. Implementation of the "sra" ISA instruction
 void isa_sra(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
-	uint32_t result = (int32_t)read_register(sim, rs) >> read_register(sim, rt);
+	uint32_t result = ((int32_t)read_register(sim, rs)) >> read_register(sim, rt);
 	write_register(sim, rd, result);
 }
 
