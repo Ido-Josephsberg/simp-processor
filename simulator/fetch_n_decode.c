@@ -26,7 +26,6 @@ static void fetch_instruction(Simulator* sim) {
 	}
 }
 
-
 static void decode_instruction(Simulator* sim) {
 	/*
 	Decode the fetched instruction and extract the opcode, rd, rs, rt, and immediate value.
@@ -94,7 +93,6 @@ static void update_all_traces_n_execute(Simulator* sim) {
 		}
 	}
 }
-
 
 static void check_for_irq2(Simulator* sim, int* irq2_index_ptr) {
 	/*
