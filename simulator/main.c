@@ -29,6 +29,7 @@ int main(int argc, char** argv) {
 		printf("Usage: %s <memin_path> <diskin_path> <irq2in_path> <memout_path> <regout_path> <trace_path> <hwregtrace_path> <cycles_path> <leds_path> <display7seg_path> <diskout_path> <monitor_txt_path> <monitor_yuv_path>\n", argv[0]);
 		return -1;
 	}
+	printf("Starting the simulator...\n");
 	// Initialize input and output paths
 	input_paths in_paths;
 	output_paths out_paths;
@@ -36,7 +37,7 @@ int main(int argc, char** argv) {
 	init_output_paths(&out_paths, argv);
 
 	// Initialize the simulator object.
-	Simulator* sim = simulator_init(in_paths, out_paths);
+	Simulator* sim = simulator_init(in_paths);
 	if (sim == NULL) {
 		fprintf(stderr, "Failed to allocate memory for the simulator.\n");
 		return MEMORY_ERROR;
@@ -57,6 +58,7 @@ int main(int argc, char** argv) {
 	write_regout_file_wrapper(sim, &out_paths);
 	
 	free_simulator(sim);
+	printf("Simulation completed successfully.\n");
 
 	return 0;
 }

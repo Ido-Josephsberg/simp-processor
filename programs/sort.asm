@@ -7,21 +7,22 @@ init:
     add $s0, $zero, $imm, 0x100     # $s0 = base address of the array
     add $s1, $zero, $zero, 0        # $s1 = i = 0
 for_i:
-    add $t0, $zero, $imm, 16        # $t0 = 16 (break limit for i)
-    beq $imm, $s1, $t0, done        # if i==16, break loop (finish)
+    add $t0, $zero, $imm, 15        # $t0 = 15 (break limit for i)
+    beq $imm, $s1, $t0, done        # if i==15, break loop (finish)
     add $s2, $zero, $zero, 0        # $s2 = j = 0
 for_j:
-    sub $t0, $imm, $s0, 15          # $t0 = 15-i (break limit for j)
-    beq $imm, $s2, $t0, inc_i       # if j == 15-i, break loop (next i)
+    sub $t0, $imm, $s1, 15          # $t0 = 15-i (break limit for j)
+    beq $imm, $s2, $t0, inc_i       # if j == 14-i, break loop (next i)
     lw $t0, $s0, $s2, 0             # $t0 = arr[j]
     add $t1, $s2, $imm, 1           # $t1 = j+1
-    lw $t1, $s0, $t1, 0             # $t1 = arr[j+1]
-    ble $imm, $t0, $t1, inc_j       # if arr[j] <= arr[j+1], dont swap
+    lw $t2, $s0, $t1, 0             # $t2 = arr[j+1]
+    ble $imm, $t0, $t2, inc_j       # if arr[j] <= arr[j+1], dont swap
 swap:
-    add $t2, $t0, $zero, 0          # $t2 = temp copy of arr[j]
-    add $t0, $s0, $s2, 0            # $t0 = address arr[j]
-    sw $t1, $t0, $zero, 0           # arr[j] = arr[j+1]
-    sw $t2, $t0, $imm, 1            # arr[j+1] = temp
+    lw $t0, $s0, $s2, 0             # $t0 = arr[j]
+    add $t1, $s2, $imm, 1           # $t1 = j+1
+    lw $t2, $s0, $t1, 0             # $t2 = arr[j+1]
+    sw $t2, $s0, $s2, 0             # arr[j] = arr[j+1]
+    sw $t0, $s0, $t1, 0             # arr[j+1] = arr[j]
 inc_j:
     add $s2, $s2, $imm, 1           # j++
     beq $imm, $zero, $zero, for_j   # jump to for_j    

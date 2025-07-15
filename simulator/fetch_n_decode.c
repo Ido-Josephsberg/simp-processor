@@ -26,7 +26,6 @@ static void fetch_instruction(Simulator* sim) {
 	}
 }
 
-
 static void decode_instruction(Simulator* sim) {
 	/*
 	Decode the fetched instruction and extract the opcode, rd, rs, rt, and immediate value.
@@ -95,7 +94,6 @@ static void update_all_traces_n_execute(Simulator* sim) {
 	}
 }
 
-
 static void check_for_irq2(Simulator* sim, int* irq2_index_ptr) {
 	/*
 	Check if the current cycle matches the IRQ2 cycle
@@ -137,14 +135,53 @@ static void update_timer(Simulator* sim) {
 	}
 }
 
-static void check_disk_avilability(Simulator* sim) {
+static void check_disk_availability(Simulator* sim, int* irq1_cycles) {
 	/*
-	Check if the disk is available for reading or writing. The disk is available every 1024 cycles.
-	If the disk is available, set the IRQ1 status to 1.
+	Write to the disk or read from it based on the disk command. Update the disk status and IRQ1 status accordingly.
 	sim: The simulator object.
+	irq1_cycles: Pointer to the cycles counter for IRQ1 (disk) to keep track when the disk is available.
 	*/
-	if (sim->cycles % 1024 == 0)
+
+	// Check if the IRQ1 cycles counter has reached 1024, which indicates that the disk is available
+	if (*irq1_cycles == 1024) {
+		// Reset the cycles counter
+		*irq1_cycles = 0; 
+		// Set the IRQ1 status to 1 to indicate that the disk is available
 		write_io_reg(sim, IRQ1STATUS, 1);
+		// Set the disk status to available
+		write_io_reg(sim, DISKSTATUS, 0); 
+		// Reset the disk command
+		write_io_reg(sim, DISKCMD, 0); 
+	}
+	// If the IRQ1 cycles counter has not reached 1024, check the disk status and command
+	else {
+		// Read the disk status and command registers
+		int disk_stat = read_io_reg(sim, DISKSTATUS);
+		int disk_cmd = read_io_reg(sim, DISKCMD);
+		// Check if the disk is available (disk_stat == 0) and there is a command to execute (disk_cmd != 0)
+		if (disk_stat == 0 && disk_cmd != 0) {
+			// If the disk is available and there is a command, set the disk status to busy, increment the cycles counter, and perform the read or write operation:
+			// Set the disk status to busy
+			write_io_reg(sim, DISKSTATUS, 1); 
+			// Get the disk sector and memory address from the I/O registers
+			int disk_sektor = read_io_reg(sim, DISKSECTOR);
+			int mem_address = read_io_reg(sim, DISKBUFFER);
+			// Iterate over the disk rows to read or write whole sector.
+			for (int row = 0; row < DISK_ROWS; row++) {
+				// If the disk command is 1 (read), write the data from the disk to memory; otherwise, write the data from memory to the disk.
+				if (disk_cmd == 1) {
+					sim->memory[mem_address + row] = sim->disk[disk_sektor][row];
+				}
+				else {
+					sim->disk[disk_sektor][row] = sim->memory[mem_address + row];
+				}
+			}
+		}
+		// If the disk is not available (disk_stat != 0), increment the cycles counter for IRQ1 (disk) to keep track of the time until the disk becomes available.
+		else if (disk_stat) {
+			(*irq1_cycles)++;
+		}
+	}
 }
 
 void fetch_n_decode_loop(Simulator* sim) {
@@ -158,10 +195,14 @@ void fetch_n_decode_loop(Simulator* sim) {
 	bool irq0, irq1, irq2, irq;
 	// Initialize the IRQ2 cycle index.
 	int irq2_index = 0;
+	// Initialize the IRQ1 (disk) cycles counter.
+	int irq1_cycles_counter = 0;
 	
 	// Keep running the loop until the simulator is not running
 	while (sim->is_running) {
-		// Check if last cycle was an instruction with big immediate value
+		printf("Cycle %d, PC: %d\n", sim->cycles, sim->pc);
+		//if (sim->cycles == sim->)
+		// TODO: REMOVE ME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		if (!sim->bigimm) {
 			// If the instruction is not a big immediate instruction, check for interrupts
 			irq0 = read_io_reg(sim, IRQ0ENABLE) & read_io_reg(sim, IRQ0STATUS);
@@ -206,7 +247,7 @@ void fetch_n_decode_loop(Simulator* sim) {
 		// Update and check IRQs.
 		check_for_irq2(sim, &irq2_index);
 		update_timer(sim);
-		check_disk_avilability(sim);
+		check_disk_availability(sim, &irq1_cycles_counter);
 
 		// Increment the cycle count.
 		sim->cycles++;
