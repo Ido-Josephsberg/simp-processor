@@ -55,10 +55,10 @@ int get_io_reg_length(io_reg_name reg_index) {
 	return -1; // Invalid index
 }
 
-int32_t read_io_reg(Simulator* sim, io_reg_name reg_index) {
+uint32_t read_io_reg(Simulator* sim, io_reg_name reg_index) {
     int len = get_io_reg_length(reg_index);
     if (len > 0 && reg_index >= 0 && reg_index < IO_REG_NUM) {
-        int32_t mask = (len == 32) ? 0xFFFFFFFF : ((1 << len) - 1);
+        uint32_t mask = (len == 32) ? 0xFFFFFFFF : ((1 << len) - 1);
         return sim->io_reg_array[reg_index] & mask;
     }
     return 0;
@@ -67,7 +67,7 @@ int32_t read_io_reg(Simulator* sim, io_reg_name reg_index) {
 void write_io_reg(Simulator* sim, io_reg_name reg_index, int32_t value) {
     int len = get_io_reg_length(reg_index);
     if (len > 0 && reg_index >= 0 && reg_index < IO_REG_NUM) {
-        int32_t mask = (len == 32) ? 0xFFFFFFFF : ((1 << len) - 1);
+        uint32_t mask = (len == 32) ? 0xFFFFFFFF : ((1 << len) - 1);
         sim->io_reg_array[reg_index] = value & mask;
     }
 }
