@@ -1,5 +1,5 @@
 init:
-    add $sp, $zero, $imm, 4068          # Initialize stack pointer
+    add $sp, $zero, $imm, 4095          # Initialize stack pointer
     lw $a0, $zero, $imm, 0x100          # Load input n
     add $ra, $zero, $imm, finalize      # Set return address to finalize
 

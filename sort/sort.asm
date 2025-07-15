@@ -1,5 +1,5 @@
 init:
-    add $sp, $zero, $imm, 4068      # Initialize stack pointer to top of memory
+    add $sp, $zero, $imm, 4095      # Initialize stack pointer to top of memory
     add $sp, $sp, $imm, -3	    	# adjust stack for 3 items
     sw $s0, $sp, $imm, 0            # save $s0 on stack[0]
     sw $s1, $sp, $imm, 1            # save $s1 on stack[1] 
