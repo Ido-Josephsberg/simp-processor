@@ -99,7 +99,7 @@ void isa_bne(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 
 // 11. Implementation of the "blt" ISA instruction
 void isa_blt(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
-	if (read_register(sim, rs) < read_register(sim, rt)) {
+	if ((int32_t)read_register(sim, rs) < (int32_t)read_register(sim, rt)) {
 		// Branch taken, adjust the program counter (sim->pc)
 		sim->pc = read_register(sim, rd) & 0xfff;	// 12 bit mask for sim->pc
 		// Set the flag to indicate that the program counter has changed
@@ -109,7 +109,7 @@ void isa_blt(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 
 // 12. Implementation of the "bgt" ISA instruction
 void isa_bgt(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
-	if (read_register(sim, rs) > read_register(sim, rt)) {
+	if ((int32_t)read_register(sim, rs) > (int32_t)read_register(sim, rt)) {
 		// Branch taken, adjust the program counter (sim->pc)
 		sim->pc = read_register(sim, rd) & 0xfff;	// 12 bit mask for sim->pc
 		// Set the flag to indicate that the program counter has changed
@@ -119,7 +119,7 @@ void isa_bgt(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 
 // 13. Implementation of the "ble" ISA instruction
 void isa_ble(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
-	if (read_register(sim, rs) <= read_register(sim, rt)) {
+	if ((int32_t)read_register(sim, rs) <= (int32_t)read_register(sim, rt)) {
 		// Branch taken, adjust the program counter (sim->pc)
 		sim->pc = read_register(sim, rd) & 0xfff;	// 12 bit mask for sim->pc
 		// Set the flag to indicate that the program counter has changed
@@ -129,7 +129,7 @@ void isa_ble(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
 
 // 14. Implementation of the "bge" ISA instruction
 void isa_bge(Simulator* sim, reg_name rd, reg_name rs, reg_name rt) {
-	if (read_register(sim, rs) >= read_register(sim, rt)) {
+	if ((int32_t)read_register(sim, rs) >= (int32_t)read_register(sim, rt)) {
 		// Branch taken, adjust the program counter (sim->pc)
 		sim->pc = read_register(sim, rd) & 0xfff;	// 12 bit mask for sim->pc
 		// Set the flag to indicate that the program counter has changed
